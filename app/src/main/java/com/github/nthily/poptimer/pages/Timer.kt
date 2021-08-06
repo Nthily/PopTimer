@@ -29,11 +29,7 @@ fun TimerPage() {
         modifier = Modifier
             .fillMaxSize()
             .clickable {
-                if (!appViewModel.isTiming) {
-                    appViewModel.startTimer()
-                } else {
-                    appViewModel.stopTimer()
-                }
+                if (!appViewModel.isTiming) appViewModel.startTimer() else appViewModel.stopTimer()
             },
         contentAlignment = Alignment.Center
     ) {
