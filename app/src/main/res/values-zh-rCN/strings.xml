@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">PopTimer</string>
     <string name="select_cube">选择一种魔方</string>
+    <string name="last_result">上次成绩 %1$s</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.github.nthily.poptimer
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FabPosition
@@ -10,6 +12,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,6 +30,7 @@ fun PopTimer() {
     val appViewModel = hiltViewModel<AppViewModel>()
     val state = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
+
     ModalBottomSheetLayout(
         sheetState = state,
         sheetContent = {
@@ -61,8 +65,8 @@ fun PopTimerScaffold() {
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = { if(appViewModel.bottomNavigationItem == 1) SelectCubeButton() },
         bottomBar = { BottomBar() },
-        backgroundColor = Color(0xFFF8F8F8)
     ) {
+        appViewModel.bottomPadding = it.calculateBottomPadding()
         when(appViewModel.bottomNavigationItem) {
             1 -> TimerPage()
         }

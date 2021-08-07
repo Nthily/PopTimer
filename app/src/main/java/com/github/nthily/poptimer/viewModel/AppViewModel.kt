@@ -4,10 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
@@ -18,26 +20,33 @@ class AppViewModel @Inject constructor()
 
     var selectCube by mutableStateOf(false)
     var bottomNavigationItem by mutableStateOf(1)
+    var bottomPadding by mutableStateOf(0.dp)
 
+    var startTime = 0L
     var time by mutableStateOf(0L)
-    var timer = Timer()
     var isTiming by mutableStateOf(false)
+    var ready by mutableStateOf(false)
 
-    fun startTimer() {
+
+    var lastResult by mutableStateOf<Long?>(null)
+    private var tempResult: Long? = null
+
+    fun readyStage() {
+        tempResult = time
         time = 0L
-        isTiming = true
-        timer.scheduleAtFixedRate(
-            timerTask {
-                viewModelScope.launch {
-                    time = time.plus(1)
-                }
-            }, 0, 1
-        )
+        ready = true
     }
 
-    fun stopTimer() {
-        isTiming = false
-        timer.cancel()
-        timer = Timer()
+    fun start() {
+        time = 0
+        startTime = System.currentTimeMillis()
+        isTiming = true
     }
+
+    fun stop() {
+        isTiming = false
+        lastResult = if(tempResult != 0L) tempResult else null
+        ready = false
+    }
+
 }
