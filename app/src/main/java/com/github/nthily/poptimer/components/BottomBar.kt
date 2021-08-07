@@ -35,7 +35,7 @@ fun BottomBar() {
                 BottomNavigation(
                     backgroundColor = Color.White,
                     modifier = Modifier
-                        .border(1.dp, Color(0xFFF2F2F2), shape = CircleShape),
+                        .border(1.dp, Color(0xFFF2F2F2)),
                 ) {
                     for(index in 1..3) {
                         BottomNavigationItem(

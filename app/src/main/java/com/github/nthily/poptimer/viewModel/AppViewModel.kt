@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.nthily.poptimer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -22,14 +23,20 @@ class AppViewModel @Inject constructor()
     var bottomNavigationItem by mutableStateOf(1)
     var bottomPadding by mutableStateOf(0.dp)
 
+    /*
+     about timer value
+    */
+
     var startTime = 0L
     var time by mutableStateOf(0L)
     var isTiming by mutableStateOf(false)
     var ready by mutableStateOf(false)
-
-
     var lastResult by mutableStateOf<Long?>(null)
     private var tempResult: Long? = null
+
+
+    var scramble by mutableStateOf(Utils.generate3x3x3CubeScramble())
+
 
     fun readyStage() {
         tempResult = time
@@ -47,6 +54,7 @@ class AppViewModel @Inject constructor()
         isTiming = false
         lastResult = if(tempResult != 0L) tempResult else null
         ready = false
+        scramble = Utils.generate3x3x3CubeScramble()
     }
 
 }
