@@ -45,12 +45,16 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.R
+import com.github.nthily.poptimer.utils.Cube
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.AppViewModel
 import kotlin.math.max
@@ -66,8 +70,6 @@ fun TimerPage() {
             while (true) {
                 withFrameMillis {
                     appViewModel.time = System.currentTimeMillis() - appViewModel.startTime
-                    //Log.d(TAG, "${appViewModel.time} ${it / 1000000.0}")
-                    //appViewModel.time = System.currentTimeMillis() - appViewModel.startTime
                 }
             }
         }
@@ -81,7 +83,6 @@ fun TimerPage() {
                     MotionEvent.ACTION_DOWN -> {
                         if (!appViewModel.isTiming) appViewModel.readyStage() else {
                             appViewModel.stop()
-                            Log.d(TAG, "value is ${Utils.format(appViewModel.time)}")
                         }
                     }
                     MotionEvent.ACTION_UP -> {
@@ -108,37 +109,43 @@ fun TimerPage() {
             LastResult()
         }
     }
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(top = 30.dp)
-        ) {
-            Surface {
-                Text(
-                    text = appViewModel.scramble,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    fontWeight = FontWeight(420),
-                    fontSize = 18.sp
-                )
-            }
-            Spacer(modifier = Modifier.padding(vertical = 5.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = {
-                          appViewModel.scramble = Utils.generate3x3x3CubeScramble()
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
+    Crossfade(targetState = appViewModel.isTiming) {
+        when(it) {
+            false -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter
                 ) {
-                    Icon(Icons.Filled.Refresh, null)
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 30.dp)
+                    ) {
+                        Surface {
+                            Text(
+                                text = appViewModel.scramble,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 10.dp),
+                                fontWeight = FontWeight(420),
+                                fontSize = 18.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(vertical = 5.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    appViewModel.scramble = Cube().generate3x3x3CubeScramble()
+                                },
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                            ) {
+                                Icon(Icons.Filled.Refresh, null)
+                            }
+                        }
+                    }
                 }
             }
         }

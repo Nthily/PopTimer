@@ -50,7 +50,7 @@ fun SelectCubeButton() {
         when(it) {
             false -> {
                 Image(
-                    painterResource(id = R.drawable.rubik),
+                    painterResource(id = R.drawable.rubik_),
                     contentDescription = null,
                     modifier = Modifier
                         .size(35.dp)

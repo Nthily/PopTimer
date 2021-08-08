@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.nthily.poptimer.utils.Cube
 import com.github.nthily.poptimer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.*
@@ -35,7 +36,7 @@ class AppViewModel @Inject constructor()
     private var tempResult: Long? = null
 
 
-    var scramble by mutableStateOf(Utils.generate3x3x3CubeScramble())
+    var scramble by mutableStateOf(Cube().generate3x3x3CubeScramble())
 
 
     fun readyStage() {
@@ -48,13 +49,13 @@ class AppViewModel @Inject constructor()
         time = 0
         startTime = System.currentTimeMillis()
         isTiming = true
+        scramble = Cube().generate3x3x3CubeScramble()
     }
 
     fun stop() {
         isTiming = false
         lastResult = if(tempResult != 0L) tempResult else null
         ready = false
-        scramble = Utils.generate3x3x3CubeScramble()
     }
 
 }
