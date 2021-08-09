@@ -2,4 +2,5 @@
     <string name="app_name">PopTimer</string>
     <string name="select_cube">Select a cube</string>
     <string name="last_result">Previously %1$s</string>
+    <string name="cube_3x3">3x3 Cube</string>
 </resources>

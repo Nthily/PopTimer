@@ -49,8 +49,8 @@ fun SelectCubeButton() {
     Crossfade(targetState = appViewModel.isTiming) {
         when(it) {
             false -> {
-                Image(
-                    painterResource(id = R.drawable.rubik_),
+                Icon(
+                    painterResource(id = R.drawable._x3),
                     contentDescription = null,
                     modifier = Modifier
                         .size(35.dp)

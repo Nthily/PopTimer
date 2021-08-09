@@ -1,6 +1,9 @@
+/*
 package com.github.nthily.poptimer.utils
 
 import kotlin.random.Random
+
+// This file is no longer used
 
 // A simple 3x3x3 Cube Expanded Chart
 // 0, 1, 2 | 3, 4, 5 | 6, 7, 8 | 9, 10, 11
@@ -28,7 +31,6 @@ import kotlin.random.Random
 // U2 -> (3, 0) -> (3, 6) | (3, 3) -> (3, 9) | (3, 6) -> (3, 0) | (3, 9) -> (3, 3) Formula: ((x/3) + 2) % 4) * 3
 // U -> (3, 0) -> (3, 9) | (3, 3) -> (3, 0) | (3, 6) -> (3, 3) | (3, 9) -> (3, 6) Formula: ((x/3) + 3) % 4) * 3
 
-
 class Cube(private val degree: Int = 3) {
 
     var cube: MutableList<Array<String>> = mutableListOf()
@@ -43,7 +45,7 @@ class Cube(private val degree: Int = 3) {
         val layer = arrayOf("F", "R", "L", "B", "U", "D")
         var temp: String
         val scramble = mutableListOf<String>()
-        val scrambleLength = Random.nextInt(20, 30)
+        val scrambleLength = Random.nextInt(20, 25)
         scramble.add(getOneStep(layer, suffix))
 
         for(index in 1 until scrambleLength) {
@@ -67,13 +69,14 @@ class Cube(private val degree: Int = 3) {
         var currentColumnLayer = 0 // Calculate the current group, from top to bottom
         var currentRowLayer: Int // Calculate the current group, from left to right
 
+
         for(column in 0 until degree * 3) {
             if(column % degree == 0) currentColumnLayer += 1
             currentRowLayer = 0
             for(row in 0 until degree * 4) {
                 if(row % degree == 0) currentRowLayer += 1
                 when(currentColumnLayer) {
-                    1 -> if(currentRowLayer == 2) cube[column][row] = "white" else cube[column][row] = ""
+                    1 -> if(currentRowLayer == 2) cube[column][row] = "white"
                     2 -> {
                         when(currentRowLayer) {
                             1 -> cube[column][row] = "orange"
@@ -82,7 +85,7 @@ class Cube(private val degree: Int = 3) {
                             4 -> cube[column][row] = "blue"
                         }
                     }
-                    3 -> if(currentRowLayer == 2) cube[column][row] = "yellow" else cube[column][row] = ""
+                    3 -> if(currentRowLayer == 2) cube[column][row] = "yellow"
                 }
             }
         }
@@ -91,15 +94,15 @@ class Cube(private val degree: Int = 3) {
 
     fun rotateU(step: String) {
 
-        // 1. Simulate the rotation of all the squares on this layer except the Surfaces
+        val type = step[0]
+        val subDegree = if(type == 'U') degree else (degree * 2 - 1)
 
-        // Calculate the y position of each face to be rotated
-        fun uLayerTargetAxisY(str: String, index: Int): Int {
+        fun targetAxisY(str: String, index: Int): Int {
             var result = 0
             when (str) {
-                "U'" -> result = ((index + degree) % (degree * 4))
-                "U2" -> result = ((index + (degree * 2)) % (degree * 4))
-                "U" -> result = ((index + (degree * 3)) % (degree * 4))
+                "U'", "D" -> result = ((index + degree) % (degree * 4))
+                "U2", "D2" -> result = ((index + (degree * 2)) % (degree * 4))
+                "U", "D'" -> result = ((index + (degree * 3)) % (degree * 4))
             }
             return result
         }
@@ -107,25 +110,15 @@ class Cube(private val degree: Int = 3) {
         val backUpAllSideColor = mutableListOf<String>()
 
         for(index in 0 until (degree * 4)) {
-            backUpAllSideColor.add(
-                cube[degree][index]
-            )
+            backUpAllSideColor.add(cube[subDegree][index])
         }
 
-        for(index in 0..3) { // Iterate over the four sides / orange -> green -> red -> blue
-
-            // Get the subscript of each group,
-            // for example, 3x3x3 Cube should be
-            // (3, 0) (3, 1) (3, 2) orange
-            // (3, 3) (3, 4) (3, 5) green
-            // (3, 6) (3, 7) (3, 8) red
-            // (3, 9) (3, 10) (3, 11) blue
+        for(index in 0..3) {
 
             val currentLayer = index * degree
 
-            // Complete the simulation rotation
             for(layer in 0 until degree) {
-                cube[degree][uLayerTargetAxisY(step, layer + currentLayer)] = backUpAllSideColor[layer + currentLayer]
+                cube[subDegree][targetAxisY(step, layer + currentLayer)] = backUpAllSideColor[layer + currentLayer]
             }
         }
 
@@ -151,3 +144,6 @@ class Cube(private val degree: Int = 3) {
 
     }
 }
+
+
+ */

@@ -11,12 +11,16 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.ui.theme.PopTimerTheme
+import com.github.nthily.poptimer.viewModel.AppViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class PopTimerApp: Application()
+
 
 class MainActivity : ComponentActivity() {
     @ExperimentalComposeUiApi
