@@ -1,21 +1,12 @@
 package com.github.nthily.poptimer.viewModel
 
 import android.app.Application
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.github.nthily.poptimer.utils.NbyNCubePuzzle
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.worldcubeassociation.tnoodle.svglite.Svg
 import javax.inject.Inject
 
 @HiltViewModel

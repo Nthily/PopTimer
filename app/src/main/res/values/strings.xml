@@ -3,5 +3,15 @@
     <string name="select_cube">Select a puzzle</string>
     <string name="last_result">Previously %1$s</string>
     <string name="best">Best %1$s</string>
-    <string name="cube_3x3">3x3 Cube</string>
+    <string name="cube_222">2x2 Cube</string>
+    <string name="cube_333">3x3 Cube</string>
+    <string name="cube_444">4x4 Cube</string>
+    <string name="cube_555">5x5 Cube</string>
+    <string name="cube_666">6x6 Cube</string>
+    <string name="cube_777">7x7 Cube</string>
+    <string name="cube_clock">Clock</string>
+    <string name="cube_mega">Megaminx</string>
+    <string name="cube_pyra">Pyraminx</string>
+    <string name="cube_skewb">Skewb</string>
+    <string name="cube_sq1">Square-1</string>
 </resources>

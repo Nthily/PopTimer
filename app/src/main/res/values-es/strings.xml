@@ -4,5 +4,15 @@
     <string name="select_cube">Seleccione un rompecabezas</string>
     <string name="last_result">Anteriormente %1$s</string>
     <string name="best">Mejor %1$s</string>
-    <string name="cube_3x3">Cubo 3x3</string>
+    <string name="cube_222">Cubo 2x2</string>
+    <string name="cube_333">Cubo 3x3</string>
+    <string name="cube_444">Cubo 4x4</string>
+    <string name="cube_555">Cubo 5x5</string>
+    <string name="cube_666">Cubo 6x6</string>
+    <string name="cube_777">Cubo 7x7</string>
+    <string name="cube_clock">Clock</string>
+    <string name="cube_mega">Megaminx</string>
+    <string name="cube_pyra">Pyraminx</string>
+    <string name="cube_skewb">Skewb</string>
+    <string name="cube_sq1">Square-1</string>
 </resources>

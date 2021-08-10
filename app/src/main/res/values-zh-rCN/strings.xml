@@ -4,5 +4,15 @@
     <string name="select_cube">选择一种魔方</string>
     <string name="last_result">上次成绩 %1$s</string>
     <string name="best">最好成绩 %1$s</string>
-    <string name="cube_3x3">三阶魔方</string>
+    <string name="cube_222">二阶魔方</string>
+    <string name="cube_333">三阶魔方</string>
+    <string name="cube_444">四阶魔方</string>
+    <string name="cube_555">五阶魔方</string>
+    <string name="cube_666">六阶魔方</string>
+    <string name="cube_777">七阶魔方</string>
+    <string name="cube_clock">魔表</string>
+    <string name="cube_mega">五魔方</string>
+    <string name="cube_pyra">金字塔</string>
+    <string name="cube_skewb">斜转魔方</string>
+    <string name="cube_sq1">SQ1</string>
 </resources>

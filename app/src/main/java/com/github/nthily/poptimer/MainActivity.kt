@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
                 val systemUiController = rememberSystemUiController()
                 val context = LocalContext.current
-                puzzleViewModel.getScramble(context, appViewModel)
+                puzzleViewModel.generateScramble(context, appViewModel)
 
                 SideEffect {
                     systemUiController.setSystemBarsColor(
