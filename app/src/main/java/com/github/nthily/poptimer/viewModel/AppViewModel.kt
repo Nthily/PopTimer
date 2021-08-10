@@ -36,35 +36,8 @@ class AppViewModel @Inject constructor(application: Application)
     var ready by mutableStateOf(false)
     var lastResult by mutableStateOf<Long?>(null)
     private var tempResult: Long? = null
-    var isRefreshing by mutableStateOf(false)
-
-
-    var currentPuzzleType by mutableStateOf(4)
-    var scramble: String by mutableStateOf("")
-    private var puzzleSvg: Svg? by mutableStateOf(null)
-    var puzzleFileLength by mutableStateOf(0L)
-    var puzzlePath by mutableStateOf("")
-
-    fun getScramble(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) {
-                puzzleFileLength = 0L
-                isRefreshing = true
-            }
-            scramble = ""
-            delay(500)
-            scramble = NbyNCubePuzzle(currentPuzzleType).generateScramble()
-            puzzleSvg = NbyNCubePuzzle(currentPuzzleType).drawScramble(scramble, hashMapOf())
-            val file = File(context.getExternalFilesDir(null), "puzzle.svg")
-            file.delete()
-            file.writeText(puzzleSvg.toString())
-            withContext(Dispatchers.Main){
-                puzzleFileLength = file.length()
-                puzzlePath = file.absolutePath
-                isRefreshing = false
-            }
-        }
-    }
+    var isRefreshingPuzzle by mutableStateOf(false)
+    var observePuzzle by mutableStateOf(false)
 
     fun readyStage() {
         tempResult = time
@@ -72,11 +45,10 @@ class AppViewModel @Inject constructor(application: Application)
         ready = true
     }
 
-    fun start(context: Context) {
+    fun start() {
         time = 0
         startTime = System.currentTimeMillis()
         isTiming = true
-        getScramble(context)
     }
 
     fun stop() {

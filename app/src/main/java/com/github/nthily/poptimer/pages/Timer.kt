@@ -79,15 +79,19 @@ import coil.ImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.github.nthily.poptimer.R
+import com.github.nthily.poptimer.components.SecondaryText
 import com.github.nthily.poptimer.utils.NbyNCubePuzzle
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.AppViewModel
+import com.github.nthily.poptimer.viewModel.PuzzleViewModel
 import java.io.File
 
 @ExperimentalComposeUiApi
 @Composable
 fun TimerPage() {
     val appViewModel = hiltViewModel<AppViewModel>()
+    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+
     val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
     val context = LocalContext.current
 
@@ -107,10 +111,16 @@ fun TimerPage() {
             .pointerInteropFilter {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        if (!appViewModel.isTiming) appViewModel.readyStage() else appViewModel.stop()
+                        if (!appViewModel.isTiming) {
+                            if (!appViewModel.observePuzzle) appViewModel.readyStage() else appViewModel.observePuzzle =
+                                false
+                        } else appViewModel.stop()
                     }
                     MotionEvent.ACTION_UP -> {
-                        if (appViewModel.ready) appViewModel.start(context)
+                        if (appViewModel.ready) {
+                            appViewModel.start()
+                            puzzleViewModel.getScramble(context, appViewModel)
+                        }
                     }
                 }
                 true
@@ -131,6 +141,12 @@ fun TimerPage() {
             )
             Spacer(Modifier.padding(vertical = 5.dp))
             LastResult()
+            SecondaryText {
+                Text(
+                    text = stringResource(id = R.string.best, "13.22"),
+                    fontSize = 14.sp
+                )
+            }
         }
     }
     Crossfade(targetState = appViewModel.isTiming) {
@@ -147,6 +163,8 @@ fun TimerPage() {
 fun TopBar() {
 
     val appViewModel = hiltViewModel<AppViewModel>()
+    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+
     val context = LocalContext.current
 
     Box(
@@ -165,58 +183,44 @@ fun TopBar() {
                     modifier = Modifier
                         .padding(8.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.avatar),
+                            painter = painterResource(id = R.drawable.ic_3x3),
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(end = 8.dp)
-                                .size(50.dp)
-                                .clip(CircleShape)
-                                .border(1.dp, color = Color.Gray, shape = CircleShape)
+                                .size(45.dp)
                         )
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.cube_3x3),
-                                fontWeight = FontWeight.W700,
-                                fontSize = 20.sp,
-                                color = Color(0xFF424242)
-                            )
-                        }
+                        Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                        Text(
+                            text = stringResource(id = R.string.cube_3x3),
+                            fontWeight = FontWeight.W700,
+                            fontSize = 20.sp,
+                            color = Color(0xFF424242)
+                        )
                     }
-                    Spacer(modifier = Modifier.padding(vertical = 5.dp))
-                    Divider(thickness = 2.dp)
+
                     Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
                     // scramble
                     Surface {
-                        //Crossfade(
-                         //   targetState = appViewModel.scramble
-                        //) {
-                            when(appViewModel.scramble) {
-                                "" -> {
-                                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Color(0xFF424242))
-                                }
-                                else -> {
-                                    Text(
-                                        text = appViewModel.scramble,
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight(420),
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(horizontal = 8.dp)
-                                            .animateContentSize()
-                                    )
-                                }
-                           // }
+                        when(puzzleViewModel.scramble) {
+                            "" -> {
+                                LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Color(0xFF424242))
+                            }
+                            else -> {
+                                Text(
+                                    text = puzzleViewModel.scramble,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight(420),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .animateContentSize()
+                                )
+                            }
                         }
                     }
                 }
@@ -224,7 +228,7 @@ fun TopBar() {
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
             // refresh
-            if(!appViewModel.isRefreshing) {
+            if(!appViewModel.isRefreshingPuzzle) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -232,7 +236,7 @@ fun TopBar() {
                 ) {
                     IconButton(
                         onClick = {
-                            appViewModel.getScramble(context)
+                            puzzleViewModel.getScramble(context, appViewModel)
                         },
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
@@ -249,6 +253,7 @@ fun TopBar() {
 @Composable
 fun BottomBar() {
     val appViewModel = hiltViewModel<AppViewModel>()
+    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .componentRegistry {
@@ -256,10 +261,8 @@ fun BottomBar() {
         }
         .build()
 
-    var requestScale by remember { mutableStateOf(false) }
-
-    val scale by animateFloatAsState(targetValue = if(requestScale) 2.5f else 1f)
-    val offsetY by animateDpAsState(targetValue = if(requestScale) (-80).dp else 0.dp)
+    val scale by animateFloatAsState(targetValue = if(appViewModel.observePuzzle) 2.5f else 1f)
+    val offsetY by animateDpAsState(targetValue = if(appViewModel.observePuzzle) (-80).dp else 0.dp)
 
     Box(
         modifier = Modifier
@@ -268,7 +271,7 @@ fun BottomBar() {
         contentAlignment = Alignment.BottomCenter
     ) {
         AnimatedVisibility(
-            visible = appViewModel.puzzleFileLength == 0L,
+            visible = puzzleViewModel.puzzleFileLength == 0L,
             enter = fadeIn(
                 animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
             ) + slideInVertically(
@@ -288,7 +291,7 @@ fun BottomBar() {
             }
         }
         AnimatedVisibility(
-            visible = appViewModel.puzzleFileLength != 0L,
+            visible = puzzleViewModel.puzzleFileLength != 0L,
             enter = fadeIn(
                 animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
             ) + slideInVertically(
@@ -308,16 +311,16 @@ fun BottomBar() {
 
         ) {
             Image(rememberImagePainter(
-                data = Uri.fromFile(File(appViewModel.puzzlePath)),
+                data = Uri.fromFile(File(puzzleViewModel.puzzlePath)),
                 imageLoader = imageLoader),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(85.dp)
                     .scale(scale)
                     .offset(y = offsetY)
                     .clickable(
                         onClick = {
-                            requestScale = !requestScale
+                            appViewModel.observePuzzle = !appViewModel.observePuzzle
                         },
                         indication = null,
                         interactionSource = MutableInteractionSource()
@@ -335,7 +338,7 @@ fun LastResult() {
         Crossfade(targetState = appViewModel.isTiming) {
             when(it) {
                 false -> {
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    SecondaryText {
                         Text(
                             text = stringResource(id = R.string.last_result, Utils.format(lastResult)),
                             fontSize = 14.sp

@@ -50,7 +50,7 @@ fun SelectCubeButton() {
         when(it) {
             false -> {
                 Icon(
-                    painterResource(id = R.drawable._x3),
+                    painterResource(id = R.drawable.apps),
                     contentDescription = null,
                     modifier = Modifier
                         .size(35.dp)

@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.ui.theme.PopTimerTheme
 import com.github.nthily.poptimer.viewModel.AppViewModel
+import com.github.nthily.poptimer.viewModel.PuzzleViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.HiltAndroidApp
 
@@ -29,10 +30,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PopTimerTheme {
-                val systemUiController = rememberSystemUiController()
                 val appViewModel = hiltViewModel<AppViewModel>()
+                val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+
+                val systemUiController = rememberSystemUiController()
                 val context = LocalContext.current
-                appViewModel.getScramble(context)
+                puzzleViewModel.getScramble(context, appViewModel)
 
                 SideEffect {
                     systemUiController.setSystemBarsColor(
