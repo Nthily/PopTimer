@@ -11,6 +11,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -196,10 +198,12 @@ fun TopBar() {
 
                     // scramble
                     Surface {
-                        Crossfade(targetState = appViewModel.scramble) {
-                            when(it) {
+                        //Crossfade(
+                         //   targetState = appViewModel.scramble
+                        //) {
+                            when(appViewModel.scramble) {
                                 "" -> {
-                                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Color(0xFF424242))
                                 }
                                 else -> {
                                     Text(
@@ -212,25 +216,29 @@ fun TopBar() {
                                             .animateContentSize()
                                     )
                                 }
-                            }
+                           // }
                         }
                     }
                 }
             }
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = {
-                        appViewModel.getScramble(context)
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
+
+            // refresh
+            if(!appViewModel.isRefreshing) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Icon(Icons.Filled.Refresh, null)
+                    IconButton(
+                        onClick = {
+                            appViewModel.getScramble(context)
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Icon(Icons.Filled.Refresh, null)
+                    }
                 }
             }
         }
@@ -247,6 +255,12 @@ fun BottomBar() {
             add(SvgDecoder(context))
         }
         .build()
+
+    var requestScale by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(targetValue = if(requestScale) 2.5f else 1f)
+    val offsetY by animateDpAsState(targetValue = if(requestScale) (-80).dp else 0.dp)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -255,8 +269,14 @@ fun BottomBar() {
     ) {
         AnimatedVisibility(
             visible = appViewModel.puzzleFileLength == 0L,
-            enter = slideInVertically() + fadeIn(),
-            exit = fadeOut()
+            enter = fadeIn(
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+            ) + slideInVertically(
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+            ),
+            exit = fadeOut(
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+            )
         ) {
             Box(
                 modifier = Modifier
@@ -269,23 +289,39 @@ fun BottomBar() {
         }
         AnimatedVisibility(
             visible = appViewModel.puzzleFileLength != 0L,
-            enter = fadeIn() + slideInVertically(
+            enter = fadeIn(
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+            ) + slideInVertically(
                 initialOffsetY = {
                     it / 2
-                }
+                },
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
             ),
-            exit = fadeOut() + slideOutVertically(
+            exit = fadeOut(
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+            ) + slideOutVertically(
                 targetOffsetY = {
                     it / 2
-                }
-            )
+                },
+                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+            ),
+
         ) {
             Image(rememberImagePainter(
                 data = Uri.fromFile(File(appViewModel.puzzlePath)),
                 imageLoader = imageLoader),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(130.dp)
+                    .size(80.dp)
+                    .scale(scale)
+                    .offset(y = offsetY)
+                    .clickable(
+                        onClick = {
+                            requestScale = !requestScale
+                        },
+                        indication = null,
+                        interactionSource = MutableInteractionSource()
+                    )
             )
         }
     }

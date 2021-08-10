@@ -30,6 +30,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             PopTimerTheme {
                 val systemUiController = rememberSystemUiController()
+                val appViewModel = hiltViewModel<AppViewModel>()
+                val context = LocalContext.current
+                appViewModel.getScramble(context)
+
                 SideEffect {
                     systemUiController.setSystemBarsColor(
                         color = Color.White
