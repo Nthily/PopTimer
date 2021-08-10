@@ -43,9 +43,11 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -74,16 +76,25 @@ fun TimerPage() {
     val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
     val context = LocalContext.current
 
-    if (appViewModel.isTiming) {
-        LaunchedEffect(Unit) {
-            while (true) {
-                withFrameMillis {
-                    appViewModel.time = System.currentTimeMillis() - appViewModel.startTime
-                }
+    LaunchedEffect(Unit) {
+        while (true) {
+            withFrameMillis {
+                if(appViewModel.isTiming) appViewModel.time = System.currentTimeMillis() - appViewModel.startTime
             }
         }
     }
+    /*
+    Image(
+        painterResource(id = R.drawable.wallhaven_g75r7d),
+        contentDescription = null,
+        modifier = Modifier
+            .alpha(0.5f)
+            .fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
 
+
+     */
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -91,9 +102,8 @@ fun TimerPage() {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
                         if (!appViewModel.isTiming) {
-                            if (!appViewModel.observePuzzle) appViewModel.readyStage() else appViewModel.observePuzzle =
-                                false
-                        } else appViewModel.stop()
+                            if (!appViewModel.observePuzzle) appViewModel.readyStage() else appViewModel.observePuzzle = false
+                        } else appViewModel.stop(puzzleViewModel)
                     }
                     MotionEvent.ACTION_UP -> {
                         if (appViewModel.ready) {
@@ -119,13 +129,7 @@ fun TimerPage() {
                     .scale(scale),
             )
             Spacer(Modifier.padding(vertical = 5.dp))
-            LastResult()
-            SecondaryText {
-                Text(
-                    text = stringResource(id = R.string.best, "13.22"),
-                    fontSize = 14.sp
-                )
-            }
+            Tips()
         }
     }
     Crossfade(targetState = appViewModel.isTiming) {
@@ -323,19 +327,32 @@ fun BottomBar() {
     }
 }
 
-
 @Composable
-fun LastResult() {
+fun Tips() {
     val appViewModel = hiltViewModel<AppViewModel>()
+    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
     appViewModel.lastResult?.let { lastResult ->
         Crossfade(targetState = appViewModel.isTiming) {
             when(it) {
                 false -> {
-                    SecondaryText {
-                        Text(
-                            text = stringResource(id = R.string.last_result, Utils.format(lastResult)),
-                            fontSize = 14.sp
-                        )
+                    Column {
+                        SecondaryText {
+                            Text(
+                                text = stringResource(id = R.string.last_result, Utils.format(lastResult)),
+                                fontSize = 14.sp,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(vertical = 2.dp))
+                        SecondaryText {
+                            Text(
+                                text = stringResource(id = R.string.best, Utils.format(puzzleViewModel.bestScore)),
+                                fontSize = 14.sp,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             }

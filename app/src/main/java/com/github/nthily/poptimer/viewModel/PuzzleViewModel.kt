@@ -30,7 +30,7 @@ class PuzzleViewModel @Inject constructor()
     var puzzleFileLength by mutableStateOf(0L)
     var puzzlePath by mutableStateOf("")
 
-
+    var bestScore by mutableStateOf(Long.MAX_VALUE)
 
     fun generateScramble(context: Context, viewModel: AppViewModel) {
         viewModelScope.launch(Dispatchers.IO) {

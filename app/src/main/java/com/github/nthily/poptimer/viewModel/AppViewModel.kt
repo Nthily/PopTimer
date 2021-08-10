@@ -1,6 +1,8 @@
 package com.github.nthily.poptimer.viewModel
 
 import android.app.Application
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -37,14 +39,14 @@ class AppViewModel @Inject constructor(application: Application)
     }
 
     fun start() {
-        time = 0
         startTime = System.currentTimeMillis()
         isTiming = true
     }
 
-    fun stop() {
+    fun stop(puzzleViewModel: PuzzleViewModel) {
         isTiming = false
         lastResult = if(tempResult != 0L) tempResult else null
         ready = false
+        if(time < puzzleViewModel.bestScore) puzzleViewModel.bestScore = time
     }
 }
