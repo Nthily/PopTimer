@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -61,12 +62,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LiveData
 import coil.ImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.components.SecondaryText
 import com.github.nthily.poptimer.components.SelectCubeMenu
+import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.AppViewModel
 import com.github.nthily.poptimer.viewModel.PuzzleViewModel
@@ -79,10 +82,6 @@ fun TimerPage() {
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
 
     val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
-    val context = LocalContext.current
-
-
-    val bestScore by rememberSaveable { mutableStateOf(Long.MAX_VALUE) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -100,9 +99,8 @@ fun TimerPage() {
             .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
-
-
      */
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -110,13 +108,14 @@ fun TimerPage() {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
                         if (!appViewModel.isTiming) {
-                            if (!appViewModel.observePuzzle) appViewModel.readyStage() else appViewModel.observePuzzle = false
+                            if (!puzzleViewModel.observePuzzle) appViewModel.readyStage() else puzzleViewModel.observePuzzle =
+                                false
                         } else appViewModel.stop(puzzleViewModel)
                     }
                     MotionEvent.ACTION_UP -> {
                         if (appViewModel.ready) {
                             appViewModel.start()
-                            puzzleViewModel.generateScramble(context, appViewModel)
+                            puzzleViewModel.generateScrambleImage()
                         }
                     }
                 }
@@ -156,7 +155,9 @@ fun TopBar() {
     val appViewModel = hiltViewModel<AppViewModel>()
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
 
-    val context = LocalContext.current
+    val backup = puzzleViewModel.currentType.observeAsState()
+
+    val currentType by rememberSaveable { backup }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -178,7 +179,22 @@ fun TopBar() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = painterResource(id = puzzleViewModel.puzzleIcon),
+                            painter = painterResource(
+                                id = when(currentType) {
+                                    Puzzles.TWO -> R.drawable.ic_2x2
+                                    Puzzles.THREE -> R.drawable.ic_3x3
+                                    Puzzles.FOUR -> R.drawable.ic_4x4
+                                    Puzzles.FIVE -> R.drawable.ic_5x5
+                                    Puzzles.SIX -> R.drawable.ic_6x6
+                                    Puzzles.SEVEN -> R.drawable.ic_7x7
+                                    Puzzles.PYRA -> R.drawable.ic_pyra
+                                    Puzzles.SQ1 -> R.drawable.ic_sq1
+                                    Puzzles.MEGA -> R.drawable.ic_mega
+                                    Puzzles.CLOCK -> R.drawable.ic_clock
+                                    Puzzles.SKEWB -> R.drawable.ic_skewb
+                                    else -> R.drawable.ic_unknown
+                                }
+                            ),
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(end = 8.dp)
@@ -186,7 +202,22 @@ fun TopBar() {
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 5.dp))
                         Text(
-                            text = stringResource(id = puzzleViewModel.currentPuzzleType),
+                            text = stringResource(
+                                id = when(currentType) {
+                                    Puzzles.TWO -> R.string.cube_222
+                                    Puzzles.THREE -> R.string.cube_333
+                                    Puzzles.FOUR -> R.string.cube_444
+                                    Puzzles.FIVE -> R.string.cube_555
+                                    Puzzles.SIX -> R.string.cube_666
+                                    Puzzles.SEVEN -> R.string.cube_777
+                                    Puzzles.PYRA -> R.string.cube_pyra
+                                    Puzzles.SQ1 -> R.string.cube_sq1
+                                    Puzzles.MEGA -> R.string.cube_mega
+                                    Puzzles.CLOCK -> R.string.cube_clock
+                                    Puzzles.SKEWB -> R.string.cube_skewb
+                                    else -> R.drawable.ic_unknown
+                                }
+                            ),
                             fontWeight = FontWeight.W700,
                             fontSize = 20.sp,
                             color = Color(0xFF424242)
@@ -233,7 +264,7 @@ fun TopBar() {
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
             // refresh
-            if(!appViewModel.isRefreshingPuzzle) {
+            if(!puzzleViewModel.isRefreshingPuzzle) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -241,7 +272,7 @@ fun TopBar() {
                 ) {
                     IconButton(
                         onClick = {
-                            puzzleViewModel.generateScramble(context, appViewModel)
+                            puzzleViewModel.generateScrambleImage()
                         },
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
@@ -266,8 +297,8 @@ fun BottomBar() {
         }
         .build()
 
-    val scale by animateFloatAsState(targetValue = if(appViewModel.observePuzzle) 2.5f else 1f)
-    val offsetY by animateDpAsState(targetValue = if(appViewModel.observePuzzle) (-80).dp else 0.dp)
+    val scale by animateFloatAsState(targetValue = if(puzzleViewModel.observePuzzle) 2.5f else 1f)
+    val offsetY by animateDpAsState(targetValue = if(puzzleViewModel.observePuzzle) (-80).dp else 0.dp)
 
     Box(
         modifier = Modifier
@@ -325,7 +356,7 @@ fun BottomBar() {
                     .offset(y = offsetY)
                     .clickable(
                         onClick = {
-                            appViewModel.observePuzzle = !appViewModel.observePuzzle
+                            puzzleViewModel.observePuzzle = !puzzleViewModel.observePuzzle
                         },
                         indication = null,
                         interactionSource = MutableInteractionSource()

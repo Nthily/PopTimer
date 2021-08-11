@@ -1,5 +1,7 @@
 package com.github.nthily.poptimer.utils
 
+import android.os.Parcel
+import android.os.Parcelable
 import org.worldcubeassociation.tnoodle.puzzle.ClockPuzzle
 import org.worldcubeassociation.tnoodle.puzzle.CubePuzzle
 import org.worldcubeassociation.tnoodle.puzzle.FourByFourCubePuzzle
@@ -11,7 +13,8 @@ import org.worldcubeassociation.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import org.worldcubeassociation.tnoodle.puzzle.TwoByTwoCubePuzzle
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 
-enum class Puzzles(val puzzle: Puzzle) {
+enum class Puzzles(val puzzle: Puzzle) : Parcelable {
+
     TWO(TwoByTwoCubePuzzle()),
     THREE(ThreeByThreeCubePuzzle()),
     FOUR(FourByFourCubePuzzle()),
@@ -22,5 +25,23 @@ enum class Puzzles(val puzzle: Puzzle) {
     SQ1(SquareOnePuzzle()),
     MEGA(MegaminxPuzzle()),
     CLOCK(ClockPuzzle()),
-    SKEWB(SkewbPuzzle())
+    SKEWB(SkewbPuzzle());
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(toString())
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Puzzles> {
+        override fun createFromParcel(parcel: Parcel): Puzzles {
+            return valueOf(parcel.readString()!!)
+        }
+
+        override fun newArray(size: Int): Array<Puzzles?> {
+            return arrayOfNulls(size)
+        }
+    }
 }

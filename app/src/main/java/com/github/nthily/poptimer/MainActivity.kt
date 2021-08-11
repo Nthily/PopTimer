@@ -36,10 +36,9 @@ class MainActivity : ComponentActivity() {
             PopTimerTheme {
                 val appViewModel = hiltViewModel<AppViewModel>()
                 val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+                puzzleViewModel.setApp(application)
 
                 val systemUiController = rememberSystemUiController()
-                val context = LocalContext.current
-                puzzleViewModel.generateScramble(context, appViewModel)
 
                 SideEffect {
                     systemUiController.setSystemBarsColor(

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.R
+import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.viewModel.AppViewModel
 import com.github.nthily.poptimer.viewModel.PuzzleViewModel
 
@@ -44,20 +45,34 @@ fun SelectCubeMenu() {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            PuzzleListItem(image = R.drawable.ic_2x2, text = R.string.cube_222, image2 = R.drawable.ic_3x3, text2 = R.string.cube_333)
-            PuzzleListItem(image = R.drawable.ic_4x4, text = R.string.cube_444, image2 = R.drawable.ic_5x5, text2 = R.string.cube_555)
-            PuzzleListItem(image = R.drawable.ic_6x6, text = R.string.cube_666, image2 = R.drawable.ic_7x7, text2 = R.string.cube_777)
-            PuzzleListItem(image = R.drawable.ic_skewb, text = R.string.cube_skewb, image2 = R.drawable.ic_mega, text2 = R.string.cube_mega)
-            PuzzleListItem(image = R.drawable.ic_pyra, text = R.string.cube_pyra, image2 = R.drawable.ic_sq1, text2 = R.string.cube_sq1)
+            PuzzleListItem(
+                image = R.drawable.ic_2x2, text = R.string.cube_222, type = Puzzles.TWO,
+                image2 = R.drawable.ic_3x3, text2 = R.string.cube_333, type2 = Puzzles.THREE
+            )
+            PuzzleListItem(
+                image = R.drawable.ic_4x4, text = R.string.cube_444, type = Puzzles.FOUR,
+                image2 = R.drawable.ic_5x5, text2 = R.string.cube_555, type2 = Puzzles.FIVE
+            )
+            PuzzleListItem(
+                image = R.drawable.ic_6x6, text = R.string.cube_666, type = Puzzles.SIX,
+                image2 = R.drawable.ic_7x7, text2 = R.string.cube_777, type2 = Puzzles.SEVEN
+            )
+            PuzzleListItem(
+                image = R.drawable.ic_skewb, text = R.string.cube_skewb, type = Puzzles.SKEWB,
+                image2 = R.drawable.ic_mega, text2 = R.string.cube_mega, type2 = Puzzles.MEGA
+            )
+            PuzzleListItem(
+                image = R.drawable.ic_pyra, text = R.string.cube_pyra, type = Puzzles.PYRA,
+                image2 = R.drawable.ic_sq1, text2 = R.string.cube_sq1, type2 = Puzzles.SQ1
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
+                        puzzleViewModel.changeType(Puzzles.CLOCK)
                         appViewModel.selectCube = false
-                        puzzleViewModel.currentPuzzleType = R.string.cube_clock
-                        puzzleViewModel.generateScramble(context, appViewModel)
                     }
             ) {
                 Image(painterResource(id = R.drawable.ic_clock), contentDescription = null, modifier = Modifier.size(40.dp))
@@ -77,8 +92,10 @@ fun SelectCubeMenu() {
 fun PuzzleListItem(
     image: Int,
     text: Int,
+    type: Puzzles,
     image2: Int,
-    text2: Int
+    text2: Int,
+    type2: Puzzles,
 ) {
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
     val appViewModel = hiltViewModel<AppViewModel>()
@@ -88,9 +105,8 @@ fun PuzzleListItem(
         Box(modifier = Modifier
             .weight(1f)
             .clickable {
+                puzzleViewModel.changeType(type)
                 appViewModel.selectCube = false
-                puzzleViewModel.currentPuzzleType = text
-                puzzleViewModel.generateScramble(context, appViewModel)
             }
         ) {
             Row(
@@ -110,9 +126,8 @@ fun PuzzleListItem(
         Box(modifier = Modifier
             .weight(1f)
             .clickable {
+                puzzleViewModel.changeType(type2)
                 appViewModel.selectCube = false
-                puzzleViewModel.currentPuzzleType = text2
-                puzzleViewModel.generateScramble(context, appViewModel)
             }
         ) {
             Row(
