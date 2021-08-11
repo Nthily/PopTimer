@@ -1,6 +1,8 @@
 package com.github.nthily.poptimer.pages
 
+import android.content.ContentValues.TAG
 import android.net.Uri
+import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -39,6 +41,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -75,6 +80,9 @@ fun TimerPage() {
 
     val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
     val context = LocalContext.current
+
+
+    val bestScore by rememberSaveable { mutableStateOf(Long.MAX_VALUE) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -331,6 +339,7 @@ fun BottomBar() {
 fun Tips() {
     val appViewModel = hiltViewModel<AppViewModel>()
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+
     appViewModel.lastResult?.let { lastResult ->
         Crossfade(targetState = appViewModel.isTiming) {
             when(it) {

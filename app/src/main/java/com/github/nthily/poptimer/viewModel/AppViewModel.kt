@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
+import com.github.nthily.poptimer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -47,6 +48,8 @@ class AppViewModel @Inject constructor(application: Application)
         isTiming = false
         lastResult = if(tempResult != 0L) tempResult else null
         ready = false
-        if(time < puzzleViewModel.bestScore) puzzleViewModel.bestScore = time
+        if(time < puzzleViewModel.bestScore) {
+            puzzleViewModel.bestScore = time
+        }
     }
 }
