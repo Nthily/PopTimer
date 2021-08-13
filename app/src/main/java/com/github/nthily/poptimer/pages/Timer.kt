@@ -36,6 +36,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -235,7 +236,7 @@ fun TopBar() {
                                 IconButton(onClick = {
                                     appViewModel.selectCube = true
                                 }) {
-                                    Icon(Icons.Filled.Settings, null)
+                                    Icon(Icons.Filled.MoreVert, null)
                                 }
                                 SelectCubeMenu()
                             }

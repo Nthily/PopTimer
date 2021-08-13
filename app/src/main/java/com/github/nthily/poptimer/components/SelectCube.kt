@@ -1,7 +1,11 @@
 package com.github.nthily.poptimer.components
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,17 +44,20 @@ import com.github.nthily.poptimer.viewModel.PuzzleViewModel
 fun SelectCubeMenu() {
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
     val appViewModel = hiltViewModel<AppViewModel>()
-    val context = LocalContext.current
 
     DropdownMenu(
         expanded = appViewModel.selectCube,
         onDismissRequest = {
             appViewModel.selectCube = false
         },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 15.dp,
+                vertical = 5.dp
+            )
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
+        Column {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -83,10 +94,14 @@ fun SelectCubeMenu() {
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        puzzleViewModel.changeType(Puzzles.CLOCK)
-                        appViewModel.selectCube = false
-                    }
+                    .clickable(
+                        onClick = {
+                            puzzleViewModel.changeType(Puzzles.CLOCK)
+                            appViewModel.selectCube = false
+                        },
+                        indication = null,
+                        interactionSource = MutableInteractionSource()
+                    )
             ) {
                 Image(painterResource(id = R.drawable.ic_clock), contentDescription = null, modifier = Modifier.size(40.dp))
                 Spacer(Modifier.padding(horizontal = 5.dp))
@@ -95,6 +110,10 @@ fun SelectCubeMenu() {
                         text = stringResource(id = R.string.cube_clock),
                         fontSize = 14.sp
                     )
+                }
+                if(puzzleViewModel.currentType == Puzzles.CLOCK) {
+                    Spacer(Modifier.padding(horizontal = 5.dp))
+                    Icon(Icons.Filled.Done, null, tint = Color(0xFF89F287))
                 }
             }
         }
@@ -116,14 +135,19 @@ fun PuzzleListItem(
     Row {
         Box(modifier = Modifier
             .weight(1f)
-            .clickable {
-                puzzleViewModel.changeType(type)
-                appViewModel.selectCube = false
-            }
+            .clickable(
+                onClick = {
+                    puzzleViewModel.changeType(type)
+                    appViewModel.selectCube = false
+                },
+                indication = null,
+                interactionSource = MutableInteractionSource()
+            )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Image(painterResource(id = image), contentDescription = null, modifier = Modifier.size(40.dp))
                 Spacer(Modifier.padding(horizontal = 5.dp))
                 SecondaryText {
@@ -132,15 +156,23 @@ fun PuzzleListItem(
                         fontSize = 14.sp
                     )
                 }
+                if(type == puzzleViewModel.currentType) {
+                    Spacer(Modifier.padding(horizontal = 5.dp))
+                    Icon(Icons.Filled.Done, null, tint = Color(0xFF89F287))
+                }
             }
         }
-        Spacer(Modifier.padding(horizontal = 5.dp))
+        Spacer(Modifier.padding(horizontal = 8.dp))
         Box(modifier = Modifier
             .weight(1f)
-            .clickable {
-                puzzleViewModel.changeType(type2)
-                appViewModel.selectCube = false
-            }
+            .clickable(
+                onClick = {
+                    puzzleViewModel.changeType(type2)
+                    appViewModel.selectCube = false
+                },
+                indication = null,
+                interactionSource = MutableInteractionSource()
+            )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -152,6 +184,10 @@ fun PuzzleListItem(
                         text = stringResource(id = text2),
                         fontSize = 14.sp
                     )
+                }
+                if(type2 == puzzleViewModel.currentType) {
+                    Spacer(Modifier.padding(horizontal = 5.dp))
+                    Icon(Icons.Filled.Done, null, tint = Color(0xFF89F287))
                 }
             }
         }
