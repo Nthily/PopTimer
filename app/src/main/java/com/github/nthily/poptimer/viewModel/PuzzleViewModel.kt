@@ -34,7 +34,6 @@ class PuzzleViewModel @Inject constructor(
     var scramble: String by mutableStateOf("")
     var isRefreshingPuzzle by mutableStateOf(false)
 
-
     fun changeType(type: Puzzles) {
         currentType = type
         config.edit().putString("currentType", currentType.name).apply()

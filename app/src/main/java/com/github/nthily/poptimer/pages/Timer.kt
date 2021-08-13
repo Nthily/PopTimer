@@ -85,7 +85,7 @@ fun TimerPage() {
     val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
 
     LaunchedEffect(Unit) {
-        puzzleViewModel.init()
+
         while (true) {
             withFrameMillis {
                 if(appViewModel.isTiming) appViewModel.time = System.currentTimeMillis() - appViewModel.startTime

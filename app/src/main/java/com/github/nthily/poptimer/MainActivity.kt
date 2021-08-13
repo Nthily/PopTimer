@@ -37,6 +37,13 @@ class MainActivity : ComponentActivity() {
             PopTimerTheme {
 
                 val systemUiController = rememberSystemUiController()
+
+                val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+
+                LaunchedEffect(true) {
+                    puzzleViewModel.init()
+                }
+
                 SideEffect {
                     systemUiController.setSystemBarsColor(
                         color = Color.White
