@@ -43,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
@@ -84,6 +85,7 @@ fun TimerPage() {
     val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
 
     LaunchedEffect(Unit) {
+        puzzleViewModel.init()
         while (true) {
             withFrameMillis {
                 if(appViewModel.isTiming) appViewModel.time = System.currentTimeMillis() - appViewModel.startTime
@@ -155,9 +157,11 @@ fun TopBar() {
     val appViewModel = hiltViewModel<AppViewModel>()
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
 
-    val backup = puzzleViewModel.currentType.observeAsState()
+    /*val backup = puzzleViewModel.currentType.observeAsState()
 
-    val currentType by rememberSaveable { backup }
+    val currentType by rememberSaveable { backup }*/
+
+    val currentType = puzzleViewModel.currentType
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -167,6 +171,7 @@ fun TopBar() {
             modifier = Modifier
                 .padding(top = 30.dp, end = 10.dp, start = 10.dp)
         ) {
+
             Surface(
                 shape = RoundedCornerShape(8.dp),
                 elevation = 8.dp
@@ -307,7 +312,7 @@ fun BottomBar() {
         contentAlignment = Alignment.BottomCenter
     ) {
         AnimatedVisibility(
-            visible = puzzleViewModel.puzzleFileLength == 0L,
+            visible = puzzleViewModel.puzzlePath == "",
             enter = fadeIn(
                 animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
             ) + slideInVertically(
@@ -327,7 +332,7 @@ fun BottomBar() {
             }
         }
         AnimatedVisibility(
-            visible = puzzleViewModel.puzzleFileLength != 0L,
+            visible = puzzleViewModel.puzzlePath != "",
             enter = fadeIn(
                 animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
             ) + slideInVertically(

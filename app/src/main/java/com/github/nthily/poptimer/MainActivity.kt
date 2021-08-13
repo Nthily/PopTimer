@@ -21,12 +21,13 @@ import com.github.nthily.poptimer.ui.theme.PopTimerTheme
 import com.github.nthily.poptimer.viewModel.AppViewModel
 import com.github.nthily.poptimer.viewModel.PuzzleViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class PopTimerApp: Application()
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @ExperimentalComposeUiApi
     @ExperimentalMaterialApi
@@ -34,17 +35,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PopTimerTheme {
-                val appViewModel = hiltViewModel<AppViewModel>()
-                val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
-                puzzleViewModel.setApp(application)
 
                 val systemUiController = rememberSystemUiController()
-
                 SideEffect {
                     systemUiController.setSystemBarsColor(
                         color = Color.White
                     )
                 }
+
                 PopTimer()
             }
         }

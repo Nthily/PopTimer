@@ -40,7 +40,7 @@ fun SelectCubeMenu() {
         onDismissRequest = {
             appViewModel.selectCube = false
         },
-        modifier = Modifier.width(250.dp)
+        //modifier = Modifier.width(250.dp)
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
@@ -99,7 +99,6 @@ fun PuzzleListItem(
 ) {
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
     val appViewModel = hiltViewModel<AppViewModel>()
-    val context = LocalContext.current
 
     Row {
         Box(modifier = Modifier
@@ -122,7 +121,7 @@ fun PuzzleListItem(
                 }
             }
         }
-
+        Spacer(Modifier.padding(horizontal = 5.dp))
         Box(modifier = Modifier
             .weight(1f)
             .clickable {
