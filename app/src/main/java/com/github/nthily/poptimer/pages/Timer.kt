@@ -38,35 +38,29 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LiveData
 import coil.ImageLoader
-import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.components.SecondaryText
@@ -75,6 +69,7 @@ import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.AppViewModel
 import com.github.nthily.poptimer.viewModel.PuzzleViewModel
+import com.skydoves.landscapist.coil.CoilImage
 import java.io.File
 
 @ExperimentalComposeUiApi
@@ -145,23 +140,18 @@ fun TimerPage() {
     Crossfade(targetState = appViewModel.isTiming) {
         when (it) {
             false -> {
-                TopBar()
-                BottomBar()
+                TimerPageTopBar()
+                TimerPageBottomBar()
             }
         }
     }
 }
 
 @Composable
-fun TopBar() {
+fun TimerPageTopBar() {
 
     val appViewModel = hiltViewModel<AppViewModel>()
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
-
-    /*val backup = puzzleViewModel.currentType.observeAsState()
-
-    val currentType by rememberSaveable { backup }*/
-
     val currentType = puzzleViewModel.currentType
 
     Box(
@@ -293,7 +283,7 @@ fun TopBar() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun BottomBar() {
+fun TimerPageBottomBar() {
     val appViewModel = hiltViewModel<AppViewModel>()
     val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
     val context = LocalContext.current
@@ -303,8 +293,9 @@ fun BottomBar() {
         }
         .build()
 
-    val scale by animateFloatAsState(targetValue = if(puzzleViewModel.observePuzzle) 2.5f else 1f)
+    val screenWidth = LocalConfiguration.current.screenWidthDp
     val offsetY by animateDpAsState(targetValue = if(puzzleViewModel.observePuzzle) (-80).dp else 0.dp)
+    val size by animateDpAsState(targetValue = if(puzzleViewModel.observePuzzle) screenWidth.dp else 90.dp)
 
     Box(
         modifier = Modifier
@@ -352,21 +343,20 @@ fun BottomBar() {
             ),
 
         ) {
-            Image(rememberImagePainter(
-                data = Uri.fromFile(File(puzzleViewModel.puzzlePath)),
-                imageLoader = imageLoader),
-                contentDescription = null,
+            CoilImage(
+                imageModel = Uri.fromFile(File(puzzleViewModel.puzzlePath)),
                 modifier = Modifier
-                    .size(85.dp)
-                    .scale(scale)
-                    .offset(y = offsetY)
+                    .offset(x = 0.dp, y = offsetY)
+                    .size(size)
                     .clickable(
                         onClick = {
                             puzzleViewModel.observePuzzle = !puzzleViewModel.observePuzzle
                         },
                         indication = null,
                         interactionSource = MutableInteractionSource()
-                    )
+                    ),
+                imageLoader = imageLoader,
+                contentScale = ContentScale.Fit
             )
         }
     }

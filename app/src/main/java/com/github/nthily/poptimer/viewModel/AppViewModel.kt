@@ -31,6 +31,7 @@ class AppViewModel @Inject constructor(application: Application)
     var lastResult by mutableStateOf<Long?>(null)
     private var tempResult: Long? = null
 
+
     fun readyStage() {
         tempResult = time
         time = 0L

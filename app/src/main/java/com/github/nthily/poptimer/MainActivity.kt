@@ -15,6 +15,7 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.ui.theme.PopTimerTheme
@@ -37,7 +38,6 @@ class MainActivity : ComponentActivity() {
             PopTimerTheme {
 
                 val systemUiController = rememberSystemUiController()
-
                 val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
 
                 LaunchedEffect(true) {
