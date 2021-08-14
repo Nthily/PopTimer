@@ -3,6 +3,7 @@
 PopTimer is a simple, lightweight Rubik's Cube timer, localization support, It uses the TNoodle library to generate scramble sequences for all current official speedsolving puzzles.
 
 Special thanks to `Twisty Timer` for being my inspirations to create this project, especially the UI.
+
 Thanks to the WCA's [TNoodle-lib](https://github.com/thewca/tnoodle-lib), which provides the official tournament standard scramble
 
 | demo | demo |
