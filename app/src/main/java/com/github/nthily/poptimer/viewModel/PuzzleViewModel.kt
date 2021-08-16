@@ -27,12 +27,12 @@ class PuzzleViewModel @Inject constructor(
 
     private val config = app.getSharedPreferences("puzzle.config", MODE_PRIVATE)
     private var scrambleScope = CoroutineScope(Dispatchers.IO)
+    private var puzzleSvg: Svg? by mutableStateOf(null)
 
     var bestScore by mutableStateOf(Long.MAX_VALUE)
     var currentType by mutableStateOf(Puzzles.valueOf(config.getString("currentType", "THREE") ?: "THREE"))
     var observePuzzle by mutableStateOf(false)
     var puzzlePath by mutableStateOf("")
-    var puzzleSvg: Svg? by mutableStateOf(null)
     var scramble: String by mutableStateOf("")
     var isRefreshingPuzzle by mutableStateOf(false)
 

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.components.BottomBar
+import com.github.nthily.poptimer.pages.RecordPage
 import com.github.nthily.poptimer.pages.TimerPage
 import com.github.nthily.poptimer.viewModel.AppViewModel
 
@@ -20,6 +21,7 @@ fun PopTimer() {
         appViewModel.bottomPadding = it.calculateBottomPadding()
         when(appViewModel.bottomNavigationItem) {
             1 -> TimerPage()
+            2 -> RecordPage()
         }
     }
 }

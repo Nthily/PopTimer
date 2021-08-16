@@ -11,8 +11,7 @@ import org.worldcubeassociation.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import org.worldcubeassociation.tnoodle.puzzle.TwoByTwoCubePuzzle
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 
-enum class Puzzles(val puzzle: Puzzle){
-
+enum class Puzzles(val puzzle: Puzzle) {
     TWO(TwoByTwoCubePuzzle()),
     THREE(ThreeByThreeCubePuzzle()),
     FOUR(FourByFourCubePuzzle()),
@@ -23,5 +22,5 @@ enum class Puzzles(val puzzle: Puzzle){
     SQ1(SquareOnePuzzle()),
     MEGA(MegaminxPuzzle()),
     CLOCK(ClockPuzzle()),
-    SKEWB(SkewbPuzzle())
+    SKEWB(SkewbPuzzle()),
 }

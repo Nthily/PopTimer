@@ -1,8 +1,6 @@
 package com.github.nthily.poptimer.pages
 
-import android.content.ContentValues.TAG
 import android.net.Uri
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -47,14 +45,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -106,8 +102,7 @@ fun TimerPage() {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
                         if (!appViewModel.isTiming) {
-                            if (!puzzleViewModel.observePuzzle) appViewModel.readyStage() else puzzleViewModel.observePuzzle =
-                                false
+                            if (!puzzleViewModel.observePuzzle) appViewModel.readyStage() else puzzleViewModel.observePuzzle = false
                         } else appViewModel.stop(puzzleViewModel)
                     }
                     MotionEvent.ACTION_UP -> {
@@ -188,7 +183,6 @@ fun TimerPageTopBar() {
                                     Puzzles.MEGA -> R.drawable.ic_mega
                                     Puzzles.CLOCK -> R.drawable.ic_clock
                                     Puzzles.SKEWB -> R.drawable.ic_skewb
-                                    else -> R.drawable.ic_unknown
                                 }
                             ),
                             contentDescription = null,
