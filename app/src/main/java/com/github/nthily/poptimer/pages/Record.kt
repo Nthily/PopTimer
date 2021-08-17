@@ -3,6 +3,7 @@ package com.github.nthily.poptimer.pages
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,13 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.components.SecondaryText
-import com.github.nthily.poptimer.database.AppModule
 import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.AppViewModel
@@ -57,7 +58,9 @@ fun RecordPage() {
         LazyVerticalGrid(
             cells = GridCells.Adaptive(minSize = 120.dp),
             state = listState,
-            modifier = Modifier.padding(bottom = appViewModel.bottomPadding),
+            modifier = Modifier
+                .padding(bottom = appViewModel.bottomPadding),
+
         ) {
             puzzleDb.value?.let {
                 items(it.size) { index ->
@@ -72,7 +75,7 @@ fun RecordPage() {
 }
 
 @Composable
-fun RecordPageTopBar(){
+fun RecordPageTopBar() {
     Box(
         modifier = Modifier
             .padding(top = 10.dp)
@@ -90,7 +93,7 @@ fun RecordPageTopBar(){
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "历史成绩",
+                    text = stringResource(id = R.string.history),
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -110,7 +113,11 @@ fun RecordCard(
             .padding(6.dp)
     ) {
         Box(
-            modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
+            modifier = Modifier
+                .clickable {
+
+                }
+                .padding(horizontal = 5.dp, vertical = 5.dp)
         ) {
             Column {
                 Row(

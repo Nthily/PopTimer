@@ -4,6 +4,7 @@
     <string name="select_cube">选择一种魔方</string>
     <string name="last_result">上次成绩 %1$s</string>
     <string name="best">最好成绩 %1$s</string>
+    <string name="history">历史记录</string>
     <string name="cube_222">二阶魔方</string>
     <string name="cube_333">三阶魔方</string>
     <string name="cube_444">四阶魔方</string>

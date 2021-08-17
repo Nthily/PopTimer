@@ -9,9 +9,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.github.nthily.poptimer.database.Puzzle
-import com.github.nthily.poptimer.database.PuzzleRepository
+import com.github.nthily.poptimer.database.PuzzleDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,12 +21,14 @@ import javax.inject.Inject
 @HiltViewModel
 class AppViewModel @Inject constructor(
     application: Application,
-    private val repository: PuzzleRepository
+   // private val repository: PuzzleRepository
 ) :AndroidViewModel(application) {
+
+    private val db by lazy { PuzzleDatabase.getDatabase(application) }
 
 
     var selectCube by mutableStateOf(false)
-    var bottomNavigationItem by mutableStateOf(2)
+    var bottomNavigationItem by mutableStateOf(1)
     var bottomPadding by mutableStateOf(0.dp)
 
     /*
@@ -59,11 +63,12 @@ class AppViewModel @Inject constructor(
                 puzzleViewModel.bestScore = time
             }
             withContext(Dispatchers.IO) {
-                repository.puzzleDao.insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
+                db.puzzleDao().insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
+                //repository.puzzleDao.insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
             }
         }
     }
     fun getSize():LiveData<List<Puzzle>> {
-        return repository.puzzleDao.getAll()
+        return db.puzzleDao().getAll()
     }
 }

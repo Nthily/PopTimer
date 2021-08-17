@@ -3,6 +3,7 @@
     <string name="select_cube">Select a puzzle</string>
     <string name="last_result">Previously %1$s</string>
     <string name="best">Best %1$s</string>
+    <string name="history">History</string>
     <string name="cube_222">2x2 Cube</string>
     <string name="cube_333">3x3 Cube</string>
     <string name="cube_444">4x4 Cube</string>

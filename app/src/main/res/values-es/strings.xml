@@ -4,6 +4,7 @@
     <string name="select_cube">Seleccione un rompecabezas</string>
     <string name="last_result">Anteriormente %1$s</string>
     <string name="best">Mejor %1$s</string>
+    <string name="history">Historia</string>
     <string name="cube_222">Cubo 2x2</string>
     <string name="cube_333">Cubo 3x3</string>
     <string name="cube_444">Cubo 4x4</string>
