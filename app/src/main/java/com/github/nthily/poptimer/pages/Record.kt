@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,8 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +51,7 @@ fun RecordPage() {
 
     val listState = rememberLazyListState()
     val appViewModel = hiltViewModel<AppViewModel>()
-    val puzzleDb = appViewModel.getSize().observeAsState()
+    val all = appViewModel.all.collectAsState(initial = null)
 
     Column(
         modifier = Modifier
@@ -62,11 +66,11 @@ fun RecordPage() {
                 .padding(bottom = appViewModel.bottomPadding),
 
         ) {
-            puzzleDb.value?.let {
-                items(it.size) { index ->
+            all.value?.let {
+                itemsIndexed(it.asReversed()) { _, item ->
                     RecordCard(
-                        score = Utils.format(puzzleDb.value!![index].score!!),
-                        type = puzzleDb.value!![index].type
+                        score = Utils.format(item.solveTime!!),
+                        type = item.type
                     )
                 }
             }
@@ -131,7 +135,10 @@ fun RecordCard(
                         SecondaryText {
                             Text(
                                 text = "08/09",
-                                style = MaterialTheme.typography.caption
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    letterSpacing = 0.sp
+                                )
                             )
                         }
                     }

@@ -65,7 +65,7 @@ class Cube(private val degree: Int = 3) {
         return layer.random() + suffix.random() + " "
     }
 
-    private fun generateNbyNbyNCube():MutableList<Array<String>>  {
+    private fun generateNbyNbyNCubeChart():MutableList<Array<String>>  {
         var currentColumnLayer = 0 // Calculate the current group, from top to bottom
         var currentRowLayer: Int // Calculate the current group, from left to right
 

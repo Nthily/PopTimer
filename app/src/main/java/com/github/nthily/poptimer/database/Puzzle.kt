@@ -7,8 +7,8 @@ import com.github.nthily.poptimer.utils.Puzzles
 
 @Entity
 data class Puzzle(
-    @PrimaryKey(autoGenerate = true) val uid: Int,
-    @ColumnInfo(name = "score") val score: Long?,
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "solveTime") val solveTime: Long?,
     @ColumnInfo(name = "time") val time: Long?,
     @ColumnInfo(name = "type") val type: Puzzles
 )

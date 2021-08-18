@@ -1,6 +1,7 @@
 package com.github.nthily.poptimer.viewModel
 
 import android.app.Application
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,10 +11,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.github.nthily.poptimer.database.Puzzle
 import com.github.nthily.poptimer.database.PuzzleDatabase
+import com.github.nthily.poptimer.database.PuzzleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -21,11 +24,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AppViewModel @Inject constructor(
     application: Application,
-   // private val repository: PuzzleRepository
+    private val puzzleRepository: PuzzleRepository
 ) :AndroidViewModel(application) {
 
-    private val db by lazy { PuzzleDatabase.getDatabase(application) }
-
+   //private val db by lazy { PuzzleDatabase.getDatabase(application) }
 
     var selectCube by mutableStateOf(false)
     var bottomNavigationItem by mutableStateOf(1)
@@ -42,6 +44,10 @@ class AppViewModel @Inject constructor(
     var lastResult by mutableStateOf<Long?>(null)
     private var tempResult: Long? = null
 
+    /*
+     about Database value
+    */
+    var all = puzzleRepository.all
 
     fun readyStage() {
         tempResult = time
@@ -63,12 +69,9 @@ class AppViewModel @Inject constructor(
                 puzzleViewModel.bestScore = time
             }
             withContext(Dispatchers.IO) {
-                db.puzzleDao().insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
-                //repository.puzzleDao.insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
+                //db.puzzleDao().insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
+                puzzleRepository.puzzleDao.insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
             }
         }
-    }
-    fun getSize():LiveData<List<Puzzle>> {
-        return db.puzzleDao().getAll()
     }
 }
