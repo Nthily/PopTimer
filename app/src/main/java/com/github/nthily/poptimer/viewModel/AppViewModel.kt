@@ -1,22 +1,16 @@
 package com.github.nthily.poptimer.viewModel
 
 import android.app.Application
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.github.nthily.poptimer.database.Puzzle
-import com.github.nthily.poptimer.database.PuzzleDatabase
 import com.github.nthily.poptimer.database.PuzzleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,7 +20,7 @@ class AppViewModel @Inject constructor(
     application: Application,
     private val puzzleRepository: PuzzleRepository
 ) :AndroidViewModel(application) {
-    
+
     var selectCube by mutableStateOf(false)
     var bottomNavigationItem by mutableStateOf(1)
     var bottomPadding by mutableStateOf(0.dp)

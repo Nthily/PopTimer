@@ -84,6 +84,7 @@ fun TimerPage() {
             }
         }
     }
+    // background
     /*
     Image(
         painterResource(id = R.drawable.wallhaven_g75r7d),
@@ -205,7 +206,6 @@ fun TimerPageTopBar() {
                                     Puzzles.MEGA -> R.string.cube_mega
                                     Puzzles.CLOCK -> R.string.cube_clock
                                     Puzzles.SKEWB -> R.string.cube_skewb
-                                    else -> R.drawable.ic_unknown
                                 }
                             ),
                             fontWeight = FontWeight.W700,
