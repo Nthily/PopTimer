@@ -52,7 +52,7 @@ class PuzzleViewModel @Inject constructor(
         scrambleScope.launch {
             val scrambleSteps = currentType.puzzle.generateScramble()
             val scrambleSvg = currentType.puzzle.drawScramble(scrambleSteps, hashMapOf())
-            File(app.filesDir.absolutePath + "/puzzle").mkdirs()
+            if(!File(app.filesDir.absolutePath + "/puzzle").exists()) File(app.filesDir.absolutePath + "/puzzle").mkdirs()
             File(app.filesDir.absolutePath + "/puzzle", "puzzle.svg").writeText(scrambleSvg.toString())
             delay(500)
             viewModelScope.launch {

@@ -26,9 +26,7 @@ class AppViewModel @Inject constructor(
     application: Application,
     private val puzzleRepository: PuzzleRepository
 ) :AndroidViewModel(application) {
-
-   //private val db by lazy { PuzzleDatabase.getDatabase(application) }
-
+    
     var selectCube by mutableStateOf(false)
     var bottomNavigationItem by mutableStateOf(1)
     var bottomPadding by mutableStateOf(0.dp)
@@ -69,7 +67,6 @@ class AppViewModel @Inject constructor(
                 puzzleViewModel.bestScore = time
             }
             withContext(Dispatchers.IO) {
-                //db.puzzleDao().insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
                 puzzleRepository.puzzleDao.insert(Puzzle(0, time, 5L, puzzleViewModel.currentType))
             }
         }
