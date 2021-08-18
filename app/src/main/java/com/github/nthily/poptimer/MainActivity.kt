@@ -22,6 +22,7 @@ import com.github.nthily.poptimer.ui.theme.PopTimerTheme
 import com.github.nthily.poptimer.viewModel.AppViewModel
 import com.github.nthily.poptimer.viewModel.PuzzleViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.tencent.mmkv.MMKV
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MMKV.initialize(this)
         setContent {
             PopTimerTheme {
 
@@ -69,6 +71,4 @@ fun PreviewTopAppBar() {
         BottomBar()
     }
 }
-
-
  */

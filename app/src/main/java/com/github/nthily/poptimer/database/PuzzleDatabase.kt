@@ -54,9 +54,7 @@ object AppModule {
                 "puzzle_database"
             )   .addCallback(PuzzleDatabaseCallback(scope))
                 .build()
-                .also {
-                    INSTANCE = it
-                }
+                .also { INSTANCE = it }
             instance
         }
     }

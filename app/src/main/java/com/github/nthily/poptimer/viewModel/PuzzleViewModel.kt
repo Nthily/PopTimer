@@ -8,9 +8,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.nthily.poptimer.utils.Puzzles
+import com.tencent.mmkv.MMKV
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -25,7 +27,7 @@ class PuzzleViewModel @Inject constructor(
     @ApplicationContext private val app: Context
 ) : ViewModel() {
 
-    private val config = app.getSharedPreferences("puzzle.config", MODE_PRIVATE)
+    private val config = MMKV.defaultMMKV()
     private var scrambleScope = CoroutineScope(Dispatchers.IO)
     private var puzzleSvg: Svg? by mutableStateOf(null)
 
@@ -38,7 +40,7 @@ class PuzzleViewModel @Inject constructor(
 
     fun changeType(type: Puzzles) {
         currentType = type
-        config.edit().putString("currentType", currentType.name).apply()
+        config.encode("currentType", currentType.name)
         generateScrambleImage()
     }
 
@@ -50,13 +52,13 @@ class PuzzleViewModel @Inject constructor(
         scrambleScope.launch {
             val scrambleSteps = currentType.puzzle.generateScramble()
             val scrambleSvg = currentType.puzzle.drawScramble(scrambleSteps, hashMapOf())
-            val scrambleFile = File(app.getExternalFilesDir(null), "puzzle.svg")
-            scrambleFile.writeText(scrambleSvg.toString())
+            File(app.filesDir.absolutePath + "/puzzle").mkdirs()
+            File(app.filesDir.absolutePath + "/puzzle", "puzzle.svg").writeText(scrambleSvg.toString())
             delay(500)
             viewModelScope.launch {
                 scramble = scrambleSteps
                 puzzleSvg = scrambleSvg
-                puzzlePath = scrambleFile.absolutePath
+                puzzlePath = app.filesDir.absolutePath + "/puzzle/puzzle.svg"
                 isRefreshingPuzzle = false
             }
         }
