@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import com.github.nthily.poptimer.database.PuzzleDatabase
 import com.github.nthily.poptimer.repository.DataRepository
 import com.github.nthily.poptimer.ui.theme.PopTimerTheme
-import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.TimerPageViewModel
 import com.github.nthily.poptimer.viewModel.RecordPageViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -62,7 +61,6 @@ class MainActivity : ComponentActivity() {
                 val timerPageViewModel = getViewModel<TimerPageViewModel>()
 
                 LaunchedEffect(true) {
-                    Utils.log("puzzle vm $timerPageViewModel")
                     timerPageViewModel.init()
                 }
 

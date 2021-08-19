@@ -7,7 +7,5 @@ class DataRepository(
     val puzzleDao: PuzzleDao
 ) {
     val all = puzzleDao.getAll()
-    var isRefreshingPuzzle = MutableLiveData(false)
-    var isObservingPuzzle = MutableLiveData(false)
     var bottomNavigationItem = MutableLiveData(1)
 }

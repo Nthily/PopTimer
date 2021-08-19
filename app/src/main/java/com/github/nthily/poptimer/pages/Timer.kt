@@ -41,7 +41,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -63,13 +62,11 @@ import coil.decode.SvgDecoder
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.components.SecondaryText
 import com.github.nthily.poptimer.components.SelectCubeMenu
-import com.github.nthily.poptimer.repository.DataRepository
 import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.TimerPageViewModel
 import com.skydoves.landscapist.coil.CoilImage
 import java.io.File
-import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -78,9 +75,6 @@ import org.koin.androidx.compose.getViewModel
 fun TimerPage() {
 
     val timerPageViewModel = getViewModel<TimerPageViewModel>()
-    val dataRepository: DataRepository = get()
-    val observingPuzzle = dataRepository.isObservingPuzzle.observeAsState().value!!
-
     val scale by animateFloatAsState(targetValue = if (timerPageViewModel.isTiming) 1.3f else 1f)
 
     LaunchedEffect(Unit) {
@@ -110,7 +104,7 @@ fun TimerPage() {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
                         if (!timerPageViewModel.isTiming) {
-                            if (!observingPuzzle) timerPageViewModel.readyStage() else dataRepository.isObservingPuzzle.value =
+                            if (!timerPageViewModel.isObservingPuzzle) timerPageViewModel.readyStage() else timerPageViewModel.isObservingPuzzle =
                                 false
                         } else timerPageViewModel.stop()
                     }
@@ -156,9 +150,6 @@ fun TimerPageTopBar() {
 
     val timerPageViewModel = getViewModel<TimerPageViewModel>()
     val currentType = timerPageViewModel.currentType
-    val dataRepository: DataRepository = get()
-
-    val isRefreshingPuzzle by dataRepository.isRefreshingPuzzle.observeAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -266,7 +257,7 @@ fun TimerPageTopBar() {
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
             // refresh
-            if(!isRefreshingPuzzle!!) {
+            if(!timerPageViewModel.isRefreshingPuzzle) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -274,7 +265,6 @@ fun TimerPageTopBar() {
                 ) {
                     IconButton(
                         onClick = {
-                            Utils.log("my $dataRepository")
                             timerPageViewModel.generateScrambleImage()
                         },
                         modifier = Modifier
@@ -292,9 +282,6 @@ fun TimerPageTopBar() {
 @Composable
 fun TimerPageBottomBar() {
     val timerPageViewModel = getViewModel<TimerPageViewModel>()
-    val dataRepository: DataRepository = get()
-    val isObservingPuzzle by dataRepository.isObservingPuzzle.observeAsState()
-
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .componentRegistry {
@@ -303,8 +290,8 @@ fun TimerPageBottomBar() {
         .build()
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val offsetY by animateDpAsState(targetValue = if(isObservingPuzzle!!) (-80).dp else 0.dp)
-    val size by animateDpAsState(targetValue = if(isObservingPuzzle!!) screenWidth.dp else 90.dp)
+    val offsetY by animateDpAsState(targetValue = if(timerPageViewModel.isObservingPuzzle) (-80).dp else 0.dp)
+    val size by animateDpAsState(targetValue = if(timerPageViewModel.isObservingPuzzle) screenWidth.dp else 90.dp)
 
     Box(
         modifier = Modifier
@@ -357,8 +344,8 @@ fun TimerPageBottomBar() {
                     .size(size)
                     .clickable(
                         onClick = {
-                            dataRepository.isObservingPuzzle.value =
-                                !dataRepository.isObservingPuzzle.value!!
+                            timerPageViewModel.isObservingPuzzle =
+                                !timerPageViewModel.isObservingPuzzle
                         },
                         indication = null,
                         interactionSource = MutableInteractionSource()

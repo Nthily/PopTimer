@@ -8,6 +8,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -21,8 +23,10 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun BottomBar(
 ) {
-    val dataRepository: DataRepository = get()
     val appViewModel = getViewModel<TimerPageViewModel>()
+    val dataRepository: DataRepository = get()
+    val bottomNavigationItem by dataRepository.bottomNavigationItem.observeAsState()
+
     Crossfade(targetState = appViewModel.isTiming) {
         when(it) {
             false -> {
@@ -40,7 +44,7 @@ fun BottomBar(
                                     else -> Icon(Icons.Filled.Settings, contentDescription = null)
                                 }
                             },
-                            selected = dataRepository.bottomNavigationItem.value == index,
+                            selected = bottomNavigationItem == index,
                             onClick = {
                                 dataRepository.bottomNavigationItem.value = index
                             }

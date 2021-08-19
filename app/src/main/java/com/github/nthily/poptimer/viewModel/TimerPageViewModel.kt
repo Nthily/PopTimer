@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.nthily.poptimer.database.Puzzle
 import com.github.nthily.poptimer.repository.DataRepository
@@ -86,6 +87,8 @@ class TimerPageViewModel (
     var puzzlePath by mutableStateOf("")
     var scramble: String by mutableStateOf("")
     var selectPuzzle by mutableStateOf(false)
+    var isRefreshingPuzzle by mutableStateOf(false)
+    var isObservingPuzzle by mutableStateOf(false)
 
     fun changeType(type: Puzzles) {
         currentType = type
@@ -96,8 +99,8 @@ class TimerPageViewModel (
     fun generateScrambleImage() {
         scramble = ""
         puzzlePath = ""
-        dataRepository.isRefreshingPuzzle.value = true
-        dataRepository.isObservingPuzzle.value = false
+        isRefreshingPuzzle = true
+        isObservingPuzzle = false
         scrambleScope.launch {
 
             val scrambleSteps = currentType.puzzle.generateScramble()
@@ -109,7 +112,7 @@ class TimerPageViewModel (
                 scramble = scrambleSteps
                 puzzleSvg = scrambleSvg
                 puzzlePath = context.filesDir.absolutePath + "/puzzle/puzzle.svg"
-                dataRepository.isRefreshingPuzzle.value = false
+                isRefreshingPuzzle = false
             }
         }
 
