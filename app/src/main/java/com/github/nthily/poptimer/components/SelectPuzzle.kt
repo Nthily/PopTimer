@@ -1,9 +1,6 @@
 package com.github.nthily.poptimer.components
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -27,28 +22,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.utils.Puzzles
-import com.github.nthily.poptimer.viewModel.AppViewModel
-import com.github.nthily.poptimer.viewModel.PuzzleViewModel
+import com.github.nthily.poptimer.viewModel.TimerPageViewModel
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SelectCubeMenu() {
-    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
-    val appViewModel = hiltViewModel<AppViewModel>()
+    val timerPageViewModel = getViewModel<TimerPageViewModel>()
 
     DropdownMenu(
-        expanded = appViewModel.selectCube,
+        expanded = timerPageViewModel.selectPuzzle,
         onDismissRequest = {
-            appViewModel.selectCube = false
+            timerPageViewModel.selectPuzzle = false
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -96,8 +88,8 @@ fun SelectCubeMenu() {
                     .fillMaxWidth()
                     .clickable(
                         onClick = {
-                            puzzleViewModel.changeType(Puzzles.CLOCK)
-                            appViewModel.selectCube = false
+                            timerPageViewModel.changeType(Puzzles.CLOCK)
+                            timerPageViewModel.selectPuzzle = false
                         },
                         indication = null,
                         interactionSource = MutableInteractionSource()
@@ -111,7 +103,7 @@ fun SelectCubeMenu() {
                         fontSize = 14.sp
                     )
                 }
-                if(puzzleViewModel.currentType == Puzzles.CLOCK) {
+                if(timerPageViewModel.currentType == Puzzles.CLOCK) {
                     Spacer(Modifier.padding(horizontal = 5.dp))
                     Icon(Icons.Filled.Done, null, tint = Color(0xFF89F287))
                 }
@@ -129,16 +121,15 @@ fun PuzzleListItem(
     text2: Int,
     type2: Puzzles,
 ) {
-    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
-    val appViewModel = hiltViewModel<AppViewModel>()
+    val timerPageViewModel = getViewModel<TimerPageViewModel>()
 
     Row {
         Box(modifier = Modifier
             .weight(1f)
             .clickable(
                 onClick = {
-                    puzzleViewModel.changeType(type)
-                    appViewModel.selectCube = false
+                    timerPageViewModel.changeType(type)
+                    timerPageViewModel.selectPuzzle = false
                 },
                 indication = null,
                 interactionSource = MutableInteractionSource()
@@ -156,7 +147,7 @@ fun PuzzleListItem(
                         fontSize = 14.sp
                     )
                 }
-                if(type == puzzleViewModel.currentType) {
+                if(type == timerPageViewModel.currentType) {
                     Spacer(Modifier.padding(horizontal = 5.dp))
                     Icon(Icons.Filled.Done, null, tint = Color(0xFF89F287))
                 }
@@ -167,8 +158,8 @@ fun PuzzleListItem(
             .weight(1f)
             .clickable(
                 onClick = {
-                    puzzleViewModel.changeType(type2)
-                    appViewModel.selectCube = false
+                    timerPageViewModel.changeType(type2)
+                    timerPageViewModel.selectPuzzle = false
                 },
                 indication = null,
                 interactionSource = MutableInteractionSource()
@@ -185,7 +176,7 @@ fun PuzzleListItem(
                         fontSize = 14.sp
                     )
                 }
-                if(type2 == puzzleViewModel.currentType) {
+                if(type2 == timerPageViewModel.currentType) {
                     Spacer(Modifier.padding(horizontal = 5.dp))
                     Icon(Icons.Filled.Done, null, tint = Color(0xFF89F287))
                 }

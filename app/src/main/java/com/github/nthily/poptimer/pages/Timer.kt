@@ -1,7 +1,9 @@
 package com.github.nthily.poptimer.pages
 
 import android.net.Uri
+import android.os.Build
 import android.view.MotionEvent
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -55,32 +58,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.components.SecondaryText
 import com.github.nthily.poptimer.components.SelectCubeMenu
+import com.github.nthily.poptimer.repository.DataRepository
 import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.utils.Utils
-import com.github.nthily.poptimer.viewModel.AppViewModel
-import com.github.nthily.poptimer.viewModel.PuzzleViewModel
+import com.github.nthily.poptimer.viewModel.TimerPageViewModel
 import com.skydoves.landscapist.coil.CoilImage
 import java.io.File
+import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalComposeUiApi
 @Composable
 fun TimerPage() {
-    val appViewModel = hiltViewModel<AppViewModel>()
-    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
 
-    val scale by animateFloatAsState(targetValue = if (appViewModel.isTiming) 1.3f else 1f)
+    val timerPageViewModel = getViewModel<TimerPageViewModel>()
+    val dataRepository: DataRepository = get()
+    val observingPuzzle = dataRepository.isObservingPuzzle.observeAsState().value!!
+
+    val scale by animateFloatAsState(targetValue = if (timerPageViewModel.isTiming) 1.3f else 1f)
 
     LaunchedEffect(Unit) {
 
         while (true) {
             withFrameMillis {
-                if(appViewModel.isTiming) appViewModel.time = System.currentTimeMillis() - appViewModel.startTime
+                if(timerPageViewModel.isTiming) timerPageViewModel.time = System.currentTimeMillis() - timerPageViewModel.startTime
             }
         }
     }
@@ -102,14 +109,15 @@ fun TimerPage() {
             .pointerInteropFilter {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        if (!appViewModel.isTiming) {
-                            if (!puzzleViewModel.observePuzzle) appViewModel.readyStage() else puzzleViewModel.observePuzzle = false
-                        } else appViewModel.stop(puzzleViewModel)
+                        if (!timerPageViewModel.isTiming) {
+                            if (!observingPuzzle) timerPageViewModel.readyStage() else dataRepository.isObservingPuzzle.value =
+                                false
+                        } else timerPageViewModel.stop()
                     }
                     MotionEvent.ACTION_UP -> {
-                        if (appViewModel.ready) {
-                            appViewModel.start()
-                            puzzleViewModel.generateScrambleImage()
+                        if (timerPageViewModel.ready) {
+                            timerPageViewModel.start()
+                            timerPageViewModel.generateScrambleImage()
                         }
                     }
                 }
@@ -122,10 +130,10 @@ fun TimerPage() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = Utils.format(appViewModel.time),
+                text = Utils.solveTimeFormat(timerPageViewModel.time),
                 fontWeight = FontWeight.W700,
                 fontSize = 75.sp,
-                color = if (appViewModel.ready && !appViewModel.isTiming) Color(0xFF96E788) else Color(0xFF424242),
+                color = if (timerPageViewModel.ready && !timerPageViewModel.isTiming) Color(0xFF96E788) else Color(0xFF424242),
                 modifier = Modifier
                     .scale(scale),
             )
@@ -133,7 +141,7 @@ fun TimerPage() {
             Tips()
         }
     }
-    Crossfade(targetState = appViewModel.isTiming) {
+    Crossfade(targetState = timerPageViewModel.isTiming) {
         when (it) {
             false -> {
                 TimerPageTopBar()
@@ -146,9 +154,11 @@ fun TimerPage() {
 @Composable
 fun TimerPageTopBar() {
 
-    val appViewModel = hiltViewModel<AppViewModel>()
-    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
-    val currentType = puzzleViewModel.currentType
+    val timerPageViewModel = getViewModel<TimerPageViewModel>()
+    val currentType = timerPageViewModel.currentType
+    val dataRepository: DataRepository = get()
+
+    val isRefreshingPuzzle by dataRepository.isRefreshingPuzzle.observeAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -217,9 +227,11 @@ fun TimerPageTopBar() {
                             contentAlignment = Alignment.CenterEnd
                         ) {
                             Column {
-                                IconButton(onClick = {
-                                    appViewModel.selectCube = true
-                                }) {
+                                IconButton(
+                                    onClick = {
+                                        timerPageViewModel.selectPuzzle = true
+                                    }
+                                ) {
                                     Icon(Icons.Filled.MoreVert, null)
                                 }
                                 SelectCubeMenu()
@@ -231,13 +243,13 @@ fun TimerPageTopBar() {
 
                     // scramble
                     Surface {
-                        when(puzzleViewModel.scramble) {
+                        when(timerPageViewModel.scramble) {
                             "" -> {
                                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Color(0xFF424242))
                             }
                             else -> {
                                 Text(
-                                    text = puzzleViewModel.scramble,
+                                    text = timerPageViewModel.scramble,
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight(420),
                                     fontSize = 18.sp,
@@ -254,7 +266,7 @@ fun TimerPageTopBar() {
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
             // refresh
-            if(!puzzleViewModel.isRefreshingPuzzle) {
+            if(!isRefreshingPuzzle!!) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -262,7 +274,8 @@ fun TimerPageTopBar() {
                 ) {
                     IconButton(
                         onClick = {
-                            puzzleViewModel.generateScrambleImage()
+                            Utils.log("my $dataRepository")
+                            timerPageViewModel.generateScrambleImage()
                         },
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
@@ -278,8 +291,10 @@ fun TimerPageTopBar() {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TimerPageBottomBar() {
-    val appViewModel = hiltViewModel<AppViewModel>()
-    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+    val timerPageViewModel = getViewModel<TimerPageViewModel>()
+    val dataRepository: DataRepository = get()
+    val isObservingPuzzle by dataRepository.isObservingPuzzle.observeAsState()
+
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .componentRegistry {
@@ -288,63 +303,62 @@ fun TimerPageBottomBar() {
         .build()
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val offsetY by animateDpAsState(targetValue = if(puzzleViewModel.observePuzzle) (-80).dp else 0.dp)
-    val size by animateDpAsState(targetValue = if(puzzleViewModel.observePuzzle) screenWidth.dp else 90.dp)
+    val offsetY by animateDpAsState(targetValue = if(isObservingPuzzle!!) (-80).dp else 0.dp)
+    val size by animateDpAsState(targetValue = if(isObservingPuzzle!!) screenWidth.dp else 90.dp)
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = appViewModel.bottomPadding),
+            .fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
     ) {
         AnimatedVisibility(
-            visible = puzzleViewModel.puzzlePath == "",
+            visible = timerPageViewModel.puzzlePath == "",
             enter = fadeIn(
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             ) + slideInVertically(
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             ),
             exit = fadeOut(
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             )
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = appViewModel.bottomPadding),
+                    .fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 CircularProgressIndicator(color = Color(0xFF424242))
             }
         }
         AnimatedVisibility(
-            visible = puzzleViewModel.puzzlePath != "",
+            visible = timerPageViewModel.puzzlePath != "",
             enter = fadeIn(
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             ) + slideInVertically(
                 initialOffsetY = {
                     it / 2
                 },
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             ),
             exit = fadeOut(
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             ) + slideOutVertically(
                 targetOffsetY = {
                     it / 2
                 },
-                animationSpec = tween(delayMillis = if(appViewModel.isTiming) 500 else 0)
+                animationSpec = tween(delayMillis = if(timerPageViewModel.isTiming) 500 else 0)
             ),
 
         ) {
             CoilImage(
-                imageModel = Uri.fromFile(File(puzzleViewModel.puzzlePath)),
+                imageModel = Uri.fromFile(File(timerPageViewModel.puzzlePath)),
                 modifier = Modifier
                     .offset(x = 0.dp, y = offsetY)
                     .size(size)
                     .clickable(
                         onClick = {
-                            puzzleViewModel.observePuzzle = !puzzleViewModel.observePuzzle
+                            dataRepository.isObservingPuzzle.value =
+                                !dataRepository.isObservingPuzzle.value!!
                         },
                         indication = null,
                         interactionSource = MutableInteractionSource()
@@ -358,17 +372,16 @@ fun TimerPageBottomBar() {
 
 @Composable
 fun Tips() {
-    val appViewModel = hiltViewModel<AppViewModel>()
-    val puzzleViewModel = hiltViewModel<PuzzleViewModel>()
+    val timerPageViewModel = getViewModel<TimerPageViewModel>()
 
-    appViewModel.lastResult?.let { lastResult ->
-        Crossfade(targetState = appViewModel.isTiming) {
+    timerPageViewModel.lastResult?.let { lastResult ->
+        Crossfade(targetState = timerPageViewModel.isTiming) {
             when(it) {
                 false -> {
                     Column {
                         SecondaryText {
                             Text(
-                                text = stringResource(id = R.string.last_result, Utils.format(lastResult)),
+                                text = stringResource(id = R.string.last_result, Utils.solveTimeFormat(lastResult)),
                                 fontSize = 14.sp,
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center
@@ -377,7 +390,7 @@ fun Tips() {
                         Spacer(modifier = Modifier.padding(vertical = 2.dp))
                         SecondaryText {
                             Text(
-                                text = stringResource(id = R.string.best, Utils.format(puzzleViewModel.bestScore)),
+                                text = stringResource(id = R.string.best, Utils.solveTimeFormat(timerPageViewModel.bestScore)),
                                 fontSize = 14.sp,
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center

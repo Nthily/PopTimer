@@ -2,30 +2,79 @@ package com.github.nthily.poptimer.viewModel
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.nthily.poptimer.database.Puzzle
 import com.github.nthily.poptimer.repository.DataRepository
 import com.github.nthily.poptimer.utils.Puzzles
-import com.github.nthily.poptimer.utils.Utils
 import com.tencent.mmkv.MMKV
 import java.io.File
+import java.time.ZonedDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.android.compat.SharedViewModelCompat
-import org.koin.androidx.compose.get
-import org.koin.java.KoinJavaComponent.inject
+import kotlinx.coroutines.withContext
 import org.worldcubeassociation.tnoodle.svglite.Svg
 
-/*
-class PuzzleViewModel (
+class TimerPageViewModel (
     application: Application,
     private val dataRepository: DataRepository
 ) : AndroidViewModel(application) {
+
+    /*
+     about timer value
+    */
+
+    var startTime = 0L
+    var time by mutableStateOf(0L)
+    var isTiming by mutableStateOf(false)
+    var ready by mutableStateOf(false)
+    var lastResult by mutableStateOf<Long?>(null)
+    private var tempResult: Long? = null
+
+    fun readyStage() {
+        tempResult = time
+        time = 0L
+        ready = true
+    }
+
+    fun start() {
+        startTime = System.currentTimeMillis()
+        isTiming = true
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun stop() {
+        val timestamp: Long = ZonedDateTime.now().toEpochSecond()
+        viewModelScope.launch {
+            isTiming = false
+            lastResult = if(tempResult != 0L) tempResult else null
+            ready = false
+            if(time < bestScore) {
+                bestScore = time
+            }
+            withContext(Dispatchers.IO) {
+                dataRepository.puzzleDao.insert(
+                    Puzzle(
+                        id = 0,
+                        solveTime = time,
+                        timestamp = timestamp,
+                        type = currentType
+                    )
+                )
+            }
+        }
+    }
+
+    /*
+      about puzzle
+     */
 
     @SuppressLint("StaticFieldLeak")
     private val context = application.applicationContext
@@ -36,6 +85,7 @@ class PuzzleViewModel (
     var currentType by mutableStateOf(Puzzles.valueOf(config.getString("currentType", "THREE") ?: "THREE"))
     var puzzlePath by mutableStateOf("")
     var scramble: String by mutableStateOf("")
+    var selectPuzzle by mutableStateOf(false)
 
     fun changeType(type: Puzzles) {
         currentType = type
@@ -70,6 +120,3 @@ class PuzzleViewModel (
     }
 
 }
-
-
- */
