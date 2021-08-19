@@ -1,4 +1,4 @@
-# PopTimer
+# PopTimer (developing)
 
 PopTimer is a simple, lightweight Rubik's Cube timer, localization support, It uses the TNoodle library to generate scramble sequences for all current official speedsolving puzzles.
 
