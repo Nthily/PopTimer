@@ -54,12 +54,12 @@ import org.koin.androidx.compose.getViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RecordPage() {
+fun RecordPage(
+    recordPageViewModel: RecordPageViewModel
+) {
 
     val listState = rememberLazyListState()
-    val recordPageViewModel = getViewModel<RecordPageViewModel>()
     val dataRepository: DataRepository = get()
-
     val all = dataRepository.all.collectAsState(initial = null)
 
     Column(
@@ -76,15 +76,21 @@ fun RecordPage() {
                 itemsIndexed(it.asReversed()) { index, item ->
                     RecordCard(
                         puzzle = item,
-                        index = all.value!!.size - index - 1,
-                        score = Utils.solveTimeFormat(item.solveTime!!)
+                        score = Utils.solveTimeFormat(item.solveTime!!),
+                        onClick = {
+                            recordPageViewModel.detailIndex = it.size - index - 1
+                            recordPageViewModel.displayDetail = true
+                        }
                     )
                 }
             }
         }
     }
     all.value?.let {
-        if(it.isNotEmpty()) RecordDetailsDialog(it[recordPageViewModel.detailIndex])
+        if(it.isNotEmpty()) RecordDetailsDialog(
+            puzzle = it[recordPageViewModel.detailIndex],
+            recordPageViewModel = recordPageViewModel
+        )
     }
 }
 
@@ -119,10 +125,9 @@ fun RecordPageTopBar() {
 @Composable
 fun RecordCard(
     puzzle: Puzzle,
-    index: Int,
-    score: String
+    score: String,
+    onClick: () -> Unit
 ) {
-    val recordPageViewModel = getViewModel<RecordPageViewModel>()
     val timestamp: ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(puzzle.timestamp), ZoneId.systemDefault())
     val monthDay = Utils.monthDayFormat(timestamp, FormatStyle.MEDIUM)
     Surface(
@@ -133,10 +138,9 @@ fun RecordCard(
     ) {
         Box(
             modifier = Modifier
-                .clickable {
-                    recordPageViewModel.detailIndex = index
-                    recordPageViewModel.displayDetail = true
-                }
+                .clickable(
+                    onClick = onClick
+                )
                 .padding(horizontal = 5.dp, vertical = 5.dp)
         ) {
             Column {
@@ -205,9 +209,9 @@ fun RecordCard(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RecordDetailsDialog(
-    puzzle: Puzzle
+    puzzle: Puzzle,
+    recordPageViewModel: RecordPageViewModel
 ) {
-    val recordPageViewModel = getViewModel<RecordPageViewModel>()
     val timestamp = ZonedDateTime.ofInstant(Instant.ofEpochSecond(puzzle.timestamp), ZoneId.systemDefault())
     val date = timestamp.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
 

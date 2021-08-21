@@ -58,11 +58,6 @@ class MainActivity : ComponentActivity() {
             PopTimerTheme {
 
                 val systemUiController = rememberSystemUiController()
-                val timerPageViewModel = getViewModel<TimerPageViewModel>()
-
-                LaunchedEffect(true) {
-                    timerPageViewModel.init()
-                }
 
                 SideEffect {
                     systemUiController.setSystemBarsColor(

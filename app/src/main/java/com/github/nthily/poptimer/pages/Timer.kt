@@ -72,9 +72,10 @@ import org.koin.androidx.compose.getViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalComposeUiApi
 @Composable
-fun TimerPage() {
+fun TimerPage(
+    timerPageViewModel: TimerPageViewModel
+) {
 
-    val timerPageViewModel = getViewModel<TimerPageViewModel>()
     val scale by animateFloatAsState(targetValue = if (timerPageViewModel.isTiming) 1.3f else 1f)
 
     LaunchedEffect(Unit) {
@@ -132,23 +133,24 @@ fun TimerPage() {
                     .scale(scale),
             )
             Spacer(Modifier.padding(vertical = 5.dp))
-            Tips()
+            Tips(timerPageViewModel)
         }
     }
     Crossfade(targetState = timerPageViewModel.isTiming) {
         when (it) {
             false -> {
-                TimerPageTopBar()
-                TimerPageBottomBar()
+                TimerPageTopBar(timerPageViewModel)
+                TimerPageBottomBar(timerPageViewModel)
             }
         }
     }
 }
 
 @Composable
-fun TimerPageTopBar() {
+fun TimerPageTopBar(
+    timerPageViewModel: TimerPageViewModel
+) {
 
-    val timerPageViewModel = getViewModel<TimerPageViewModel>()
     val currentType = timerPageViewModel.currentType
 
     Box(
@@ -225,7 +227,7 @@ fun TimerPageTopBar() {
                                 ) {
                                     Icon(Icons.Filled.MoreVert, null)
                                 }
-                                SelectCubeMenu()
+                                SelectCubeMenu(timerPageViewModel)
                             }
                         }
                     }
@@ -280,8 +282,9 @@ fun TimerPageTopBar() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun TimerPageBottomBar() {
-    val timerPageViewModel = getViewModel<TimerPageViewModel>()
+fun TimerPageBottomBar(
+    timerPageViewModel: TimerPageViewModel
+) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .componentRegistry {
@@ -358,8 +361,9 @@ fun TimerPageBottomBar() {
 }
 
 @Composable
-fun Tips() {
-    val timerPageViewModel = getViewModel<TimerPageViewModel>()
+fun Tips(
+    timerPageViewModel: TimerPageViewModel
+) {
 
     timerPageViewModel.lastResult?.let { lastResult ->
         Crossfade(targetState = timerPageViewModel.isTiming) {
