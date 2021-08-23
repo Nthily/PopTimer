@@ -66,7 +66,6 @@ fun RecordPage(
     val listState = rememberLazyListState()
     val dataRepository: DataRepository = get()
     val all = dataRepository.all.collectAsState(initial = null)
-
     Column(
         modifier = Modifier
             .padding(horizontal = 10.dp),
