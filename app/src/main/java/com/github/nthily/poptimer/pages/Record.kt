@@ -21,8 +21,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -33,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -169,19 +174,7 @@ fun RecordCard(
                     ) {
                         Image(
                             painterResource(
-                                id = when(puzzle.type) {
-                                    Puzzles.TWO -> R.drawable.ic_2x2
-                                    Puzzles.THREE -> R.drawable.ic_3x3
-                                    Puzzles.FOUR -> R.drawable.ic_4x4
-                                    Puzzles.FIVE -> R.drawable.ic_5x5
-                                    Puzzles.SIX -> R.drawable.ic_6x6
-                                    Puzzles.SEVEN -> R.drawable.ic_7x7
-                                    Puzzles.PYRA -> R.drawable.ic_pyra
-                                    Puzzles.SQ1 -> R.drawable.ic_sq1
-                                    Puzzles.MEGA -> R.drawable.ic_mega
-                                    Puzzles.CLOCK -> R.drawable.ic_clock
-                                    Puzzles.SKEWB -> R.drawable.ic_skewb
-                                }
+                                id = Utils.getTypeImg(puzzle.type)
                             ),
                             contentDescription = null,
                             modifier = Modifier
@@ -224,11 +217,12 @@ fun RecordDetailsDialog(
             Box(
                 modifier = Modifier
                     .background(Color.White)
+                    .padding(12.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(vertical = 5.dp)
-                        .padding(horizontal = 5.dp)
+                        .padding(vertical = 8.dp)
+                        .padding(horizontal = 8.dp)
                 ) {
                     Box(
                         modifier = Modifier.fillMaxWidth(),
@@ -239,9 +233,38 @@ fun RecordDetailsDialog(
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold
                         )
-                    }
-                    Divider(thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            IconButton(
+                                onClick = {
 
+                                }
+                            ) {
+                                Icon(Icons.Filled.Share, null)
+                            }
+                        }
+                    }
+                    Divider(
+                        thickness = 1.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painterResource(id = Utils.getTypeImg(puzzle.type)),
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.padding(horizontal = 15.dp))
+                        Text(
+                            text = puzzle.scramble,
+                            fontSize = 14.sp,
+                        )
+                    }
                     /*
                     Row(
                         verticalAlignment = Alignment.Top,

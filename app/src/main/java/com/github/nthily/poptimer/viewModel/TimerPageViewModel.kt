@@ -38,6 +38,7 @@ class TimerPageViewModel (
     var ready by mutableStateOf(false)
     var lastResult by mutableStateOf<Long?>(null)
     private var tempResult: Long? = null
+    var backupScramble by mutableStateOf("")
 
     fun readyStage() {
         tempResult = time
@@ -66,7 +67,8 @@ class TimerPageViewModel (
                         id = 0,
                         solveTime = time,
                         timestamp = timestamp,
-                        type = currentType
+                        type = currentType,
+                        scramble = backupScramble
                     )
                 )
             }

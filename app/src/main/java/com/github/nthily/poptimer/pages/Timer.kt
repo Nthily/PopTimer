@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -57,9 +58,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.github.nthily.poptimer.R
+import com.github.nthily.poptimer.components.Screen
 import com.github.nthily.poptimer.components.SecondaryText
 import com.github.nthily.poptimer.components.SelectCubeMenu
 import com.github.nthily.poptimer.utils.Puzzles
@@ -73,7 +76,8 @@ import org.koin.androidx.compose.getViewModel
 @ExperimentalComposeUiApi
 @Composable
 fun TimerPage(
-    timerPageViewModel: TimerPageViewModel
+    timerPageViewModel: TimerPageViewModel,
+    navController: NavController
 ) {
 
     val scale by animateFloatAsState(targetValue = if (timerPageViewModel.isTiming) 1.3f else 1f)
@@ -112,6 +116,7 @@ fun TimerPage(
                     MotionEvent.ACTION_UP -> {
                         if (timerPageViewModel.ready) {
                             timerPageViewModel.start()
+                            timerPageViewModel.backupScramble = timerPageViewModel.scramble
                             timerPageViewModel.generateScrambleImage()
                         }
                     }
@@ -139,7 +144,9 @@ fun TimerPage(
     Crossfade(targetState = timerPageViewModel.isTiming) {
         when (it) {
             false -> {
-                TimerPageTopBar(timerPageViewModel)
+                TimerPageTopBar(timerPageViewModel) {
+                    navController.navigate(Screen.About.route)
+                }
                 TimerPageBottomBar(timerPageViewModel)
             }
         }
@@ -148,7 +155,8 @@ fun TimerPage(
 
 @Composable
 fun TimerPageTopBar(
-    timerPageViewModel: TimerPageViewModel
+    timerPageViewModel: TimerPageViewModel,
+    onClick: () -> Unit
 ) {
 
     val currentType = timerPageViewModel.currentType
@@ -161,7 +169,10 @@ fun TimerPageTopBar(
             modifier = Modifier
                 .padding(top = 30.dp, end = 10.dp, start = 10.dp)
         ) {
+            /*
+            Button(onClick = onClick) {
 
+            }*/
             Surface(
                 shape = RoundedCornerShape(8.dp),
                 elevation = 8.dp
@@ -175,19 +186,7 @@ fun TimerPageTopBar(
                     ) {
                         Image(
                             painter = painterResource(
-                                id = when(currentType) {
-                                    Puzzles.TWO -> R.drawable.ic_2x2
-                                    Puzzles.THREE -> R.drawable.ic_3x3
-                                    Puzzles.FOUR -> R.drawable.ic_4x4
-                                    Puzzles.FIVE -> R.drawable.ic_5x5
-                                    Puzzles.SIX -> R.drawable.ic_6x6
-                                    Puzzles.SEVEN -> R.drawable.ic_7x7
-                                    Puzzles.PYRA -> R.drawable.ic_pyra
-                                    Puzzles.SQ1 -> R.drawable.ic_sq1
-                                    Puzzles.MEGA -> R.drawable.ic_mega
-                                    Puzzles.CLOCK -> R.drawable.ic_clock
-                                    Puzzles.SKEWB -> R.drawable.ic_skewb
-                                }
+                                id = Utils.getTypeImg(currentType)
                             ),
                             contentDescription = null,
                             modifier = Modifier

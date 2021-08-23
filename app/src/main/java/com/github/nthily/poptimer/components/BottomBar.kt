@@ -1,5 +1,6 @@
 package com.github.nthily.poptimer.components
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.border
 import androidx.compose.material.BottomNavigation
@@ -17,27 +18,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.nthily.poptimer.R
 import com.github.nthily.poptimer.repository.DataRepository
+import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.TimerPageViewModel
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 
-object Destinations {
-    const val TIMERPAGE = "TimerPage"
-    const val RECORDPAGE = "RecordPage"
-    const val SETTINGPAGE = "SettingPage"
-    val list = listOf(TIMERPAGE, RECORDPAGE, SETTINGPAGE)
+sealed class Screen(val route: String) {
+    object Timer : Screen("TimerPage")
+    object Record : Screen("RecordPage")
+    object Setting : Screen("SettingPage")
+    object About : Screen("AboutPage")
 }
 
 @Composable
 fun BottomBar(
     navController: NavController
 ) {
+
     val timerPageViewModel = getViewModel<TimerPageViewModel>()
-    val dataRepository: DataRepository = get()
-    val bottomNavigationItem by dataRepository.bottomNavigationItem.observeAsState()
+    val items = listOf(Screen.Timer, Screen.Record, Screen.Setting)
 
     Crossfade(targetState = timerPageViewModel.isTiming) {
         when(it) {
@@ -47,24 +52,27 @@ fun BottomBar(
                     modifier = Modifier
                         .border(1.dp, Color(0xFFF2F2F2)),
                 ) {
-                    for(index in Destinations.list) {
+
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+
+                    items.forEach { screen ->
                         BottomNavigationItem(
                             icon = {
-                                when(index){
-                                    Destinations.TIMERPAGE -> Icon(painterResource(id = R.drawable.timer), contentDescription = null)
-                                    Destinations.RECORDPAGE -> Icon(painterResource(id = R.drawable.analytics), contentDescription = null)
+                                when(screen){
+                                    Screen.Timer -> Icon(painterResource(id = R.drawable.timer), contentDescription = null)
+                                    Screen.Record -> Icon(painterResource(id = R.drawable.analytics), contentDescription = null)
                                     else -> Icon(Icons.Filled.Settings, contentDescription = null)
                                 }
                             },
-                            selected = bottomNavigationItem == index,
+                            selected = currentDestination?.hierarchy?.any { it -> it.route == screen.route } == true,
                             onClick = {
-                                if(bottomNavigationItem != index) {
-                                    navController.navigate(index) {
-                                        popUpTo(dataRepository.bottomNavigationItem.value!!) {
+                                if(currentDestination!!.route != screen.route) {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(currentDestination.route!!) {
                                             inclusive = true
                                         }
                                     }
-                                    dataRepository.bottomNavigationItem.value = index
                                 }
                             }
                         )
@@ -74,4 +82,3 @@ fun BottomBar(
         }
     }
 }
-

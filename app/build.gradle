@@ -67,6 +67,7 @@ dependencies {
 
     // accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
 
     // WCA-Tnoodle
     implementation 'org.worldcubeassociation.tnoodle:lib-scrambles:0.18.0'

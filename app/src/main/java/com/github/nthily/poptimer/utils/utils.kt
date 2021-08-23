@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.github.nthily.poptimer.R
 import java.time.ZonedDateTime
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.*
 import java.util.concurrent.TimeUnit
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import kotlin.math.max
 import kotlin.math.min
 
@@ -54,4 +56,21 @@ object Utils {
         if(is24Hours) pattern = pattern.replace(Regex("[hKk]+"), "H").replace("a", "").trim()
         return timestamp.format(DateTimeFormatter.ofPattern(pattern))
     }
+
+    fun getTypeImg(type: Puzzles): Int {
+        return when(type) {
+            Puzzles.TWO -> R.drawable.ic_2x2
+            Puzzles.THREE -> R.drawable.ic_3x3
+            Puzzles.FOUR -> R.drawable.ic_4x4
+            Puzzles.FIVE -> R.drawable.ic_5x5
+            Puzzles.SIX -> R.drawable.ic_6x6
+            Puzzles.SEVEN -> R.drawable.ic_7x7
+            Puzzles.PYRA -> R.drawable.ic_pyra
+            Puzzles.SQ1 -> R.drawable.ic_sq1
+            Puzzles.MEGA -> R.drawable.ic_mega
+            Puzzles.CLOCK -> R.drawable.ic_clock
+            Puzzles.SKEWB -> R.drawable.ic_skewb
+        }
+    }
+
 }
