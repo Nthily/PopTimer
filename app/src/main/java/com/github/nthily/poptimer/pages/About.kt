@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 fun About() {
     Box(
         modifier = Modifier.fillMaxSize()
-            .background(Color(0xFF0079D3))
+            .background(Color(0xFFF8F8F8))
     ) {
         Text("123")
     }

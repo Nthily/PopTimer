@@ -109,7 +109,7 @@ fun TimerPage(
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
                         if (!timerPageViewModel.isTiming) {
-                            if (!timerPageViewModel.isObservingPuzzle) timerPageViewModel.readyStage() else timerPageViewModel.isObservingPuzzle =
+                            if (!timerPageViewModel.isObservingPuzzle && !timerPageViewModel.isRefreshingPuzzle) timerPageViewModel.readyStage() else timerPageViewModel.isObservingPuzzle =
                                 false
                         } else timerPageViewModel.stop()
                     }
@@ -144,9 +144,7 @@ fun TimerPage(
     Crossfade(targetState = timerPageViewModel.isTiming) {
         when (it) {
             false -> {
-                TimerPageTopBar(timerPageViewModel) {
-                    navController.navigate(Screen.About.route)
-                }
+                TimerPageTopBar(timerPageViewModel)
                 TimerPageBottomBar(timerPageViewModel)
             }
         }
@@ -156,7 +154,6 @@ fun TimerPage(
 @Composable
 fun TimerPageTopBar(
     timerPageViewModel: TimerPageViewModel,
-    onClick: () -> Unit
 ) {
 
     val currentType = timerPageViewModel.currentType
@@ -169,10 +166,6 @@ fun TimerPageTopBar(
             modifier = Modifier
                 .padding(top = 30.dp, end = 10.dp, start = 10.dp)
         ) {
-            /*
-            Button(onClick = onClick) {
-
-            }*/
             Surface(
                 shape = RoundedCornerShape(8.dp),
                 elevation = 8.dp
