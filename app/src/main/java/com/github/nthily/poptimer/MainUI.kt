@@ -121,7 +121,7 @@ fun PopTimer() {
                             Screen.Setting.route ->
                                 slideOutHorizontally(
                                     targetOffsetX = { screenWidth ->
-                                        screenWidth
+                                        -screenWidth
                                     },
                                     animationSpec = tween(pageTweenMillis)
                                 )
@@ -145,7 +145,7 @@ fun PopTimer() {
                             Screen.About.route ->
                                 slideInHorizontally(
                                     initialOffsetX = { screenWidth ->
-                                        screenWidth
+                                        -screenWidth
                                     },
                                     animationSpec = tween(pageTweenMillis)
                                 )

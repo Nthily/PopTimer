@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 @Database(entities = [Puzzle::class], version = 1, exportSchema = false)
 abstract class PuzzleDatabase : RoomDatabase() {
     abstract fun getPuzzleDao() : PuzzleDao
+
     private class PuzzleDataBaseCallBack(
         private val scope: CoroutineScope
     ): RoomDatabase.Callback() {
@@ -39,8 +40,7 @@ abstract class PuzzleDatabase : RoomDatabase() {
                     context.applicationContext,
                     PuzzleDatabase::class.java,
                     "puzzle_database"
-                )
-                    .addCallback(PuzzleDataBaseCallBack(scope))
+                ) //.addCallback(PuzzleDataBaseCallBack(scope))
                     .build()
                 INSTANCE = instance
                 instance

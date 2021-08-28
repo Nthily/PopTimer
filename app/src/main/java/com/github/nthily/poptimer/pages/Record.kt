@@ -68,10 +68,12 @@ fun RecordPage(
     val all = dataRepository.all.collectAsState(initial = null)
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .padding(horizontal = 10.dp),
     ) {
         RecordPageTopBar()
         Spacer(Modifier.padding(vertical = 5.dp))
+
         LazyVerticalGrid(
             cells = GridCells.Adaptive(minSize = 120.dp),
             state = listState,
