@@ -1,4 +1,4 @@
-package com.github.nthily.poptimer.pages
+package com.github.nthily.poptimer.pages.record
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -37,15 +37,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import com.github.nthily.poptimer.R
+import com.github.nthily.poptimer.components.Screen
 import com.github.nthily.poptimer.components.SecondaryText
 import com.github.nthily.poptimer.database.Puzzle
 import com.github.nthily.poptimer.repository.DataRepository
-import com.github.nthily.poptimer.utils.Puzzles
 import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.RecordPageViewModel
 import java.time.Instant
@@ -53,14 +55,15 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import okhttp3.internal.Util
 import org.koin.androidx.compose.get
-import org.koin.androidx.compose.getViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecordPage(
-    recordPageViewModel: RecordPageViewModel
+    recordPageViewModel: RecordPageViewModel,
+    navController: NavHostController
 ) {
 
     val listState = rememberLazyListState()
@@ -73,30 +76,22 @@ fun RecordPage(
     ) {
         RecordPageTopBar()
         Spacer(Modifier.padding(vertical = 5.dp))
-
         LazyVerticalGrid(
             cells = GridCells.Adaptive(minSize = 120.dp),
             state = listState,
         ) {
             all.value?.let {
-                itemsIndexed(it.asReversed()) { index, item ->
+                itemsIndexed(it.asReversed()) { _, item ->
                     RecordCard(
                         puzzle = item,
                         score = Utils.solveTimeFormat(item.solveTime!!),
                         onClick = {
-                            recordPageViewModel.detailIndex = it.size - index - 1
-                            recordPageViewModel.displayDetail = true
+                            navController.navigate("${Screen.Record.route}/${item.id}")
                         }
                     )
                 }
             }
         }
-    }
-    all.value?.let {
-        if(it.isNotEmpty()) RecordDetailsDialog(
-            puzzle = it[recordPageViewModel.detailIndex],
-            recordPageViewModel = recordPageViewModel
-        )
     }
 }
 
@@ -200,6 +195,7 @@ fun RecordCard(
     }
 }
 
+/*
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RecordDetailsDialog(
@@ -300,3 +296,4 @@ fun RecordDetailsDialog(
         }
     }
 }
+*/

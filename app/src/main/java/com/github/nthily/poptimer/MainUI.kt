@@ -15,14 +15,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navArgument
 import com.google.accompanist.navigation.animation.composable
 import com.github.nthily.poptimer.components.BottomBar
 import com.github.nthily.poptimer.components.Screen
 import com.github.nthily.poptimer.pages.About
-import com.github.nthily.poptimer.pages.RecordPage
+import com.github.nthily.poptimer.pages.record.RecordPage
 import com.github.nthily.poptimer.pages.SettingPage
 import com.github.nthily.poptimer.pages.TimerPage
+import com.github.nthily.poptimer.pages.record.RecordDetails
+import com.github.nthily.poptimer.utils.Utils
 import com.github.nthily.poptimer.viewModel.RecordPageViewModel
 import com.github.nthily.poptimer.viewModel.TimerPageViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -55,147 +60,168 @@ fun PopTimer() {
                 .fillMaxSize()
                 .padding(bottom = it.calculateBottomPadding())
         ) {
-            AnimatedNavHost(
+            NavHost(
                 navController = navController,
-                startDestination = Screen.Timer.route
-            ) {
-                composable(
-                    route = Screen.Timer.route,
-                    enterTransition = { initial, _ ->
-                        when (initial.destination.route) {
-                            Screen.Record.route, Screen.Setting.route, Screen.About.route ->
-                                slideInHorizontally(
-                                    initialOffsetX = { screenWidth ->
-                                        -screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            else -> null
-                        }
-                    },
-                    exitTransition = { _, target ->
-                        when (target.destination.route) {
-                            Screen.Record.route, Screen.Setting.route, Screen.About.route ->
-                                slideOutHorizontally(
-                                    targetOffsetX = { screenWidth ->
-                                        -screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            else -> null
-                        }
-                    },
-                ) {
-                    TimerPage(timerPageViewModel, navController)
+                timerPageViewModel = timerPageViewModel,
+                recordPageViewModel = recordPageViewModel
+            )
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalAnimationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
+@Composable
+fun NavHost(
+    navController : NavHostController,
+    timerPageViewModel : TimerPageViewModel,
+    recordPageViewModel: RecordPageViewModel
+) {
+    AnimatedNavHost(
+        navController = navController,
+        startDestination = Screen.Timer.route
+    ) {
+        composable(
+            route = Screen.Timer.route,
+            enterTransition = { initial, _ ->
+                when (initial.destination.route) {
+                    Screen.Record.route, Screen.Setting.route, Screen.About.route ->
+                        slideInHorizontally(
+                            initialOffsetX = { screenWidth ->
+                                -screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    else -> null
                 }
-                composable(
-                    route = Screen.Record.route,
-                    enterTransition = { initial, _ ->
-                        when (initial.destination.route) {
-                            Screen.Timer.route ->
-                                slideInHorizontally(
-                                    initialOffsetX = { screenWidth ->
-                                        screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            Screen.Setting.route ->
-                                slideInHorizontally(
-                                    initialOffsetX = { screenWidth ->
-                                        -screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            else -> null
-                        }
-                    },
-                    exitTransition = { _, target ->
-                        when (target.destination.route) {
-                            Screen.Timer.route ->
-                                slideOutHorizontally(
-                                    targetOffsetX = { screenWidth ->
-                                        screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            Screen.Setting.route ->
-                                slideOutHorizontally(
-                                    targetOffsetX = { screenWidth ->
-                                        -screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            else -> null
-                        }
-                    },
-                ) {
-                    RecordPage(recordPageViewModel)
+            },
+            exitTransition = { _, target ->
+                when (target.destination.route) {
+                    Screen.Record.route, Screen.Setting.route, Screen.About.route ->
+                        slideOutHorizontally(
+                            targetOffsetX = { screenWidth ->
+                                -screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    else -> null
                 }
-                composable(
-                    route = Screen.Setting.route,
-                    enterTransition = { initial, _ ->
-                        when (initial.destination.route) {
-                            Screen.Record.route, Screen.Timer.route ->
-                                slideInHorizontally(
-                                    initialOffsetX = { screenWidth ->
-                                        screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            Screen.About.route ->
-                                slideInHorizontally(
-                                    initialOffsetX = { screenWidth ->
-                                        -screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            else -> null
-                        }
-                    },
-                    exitTransition = { _, target ->
-                        when (target.destination.route) {
-                            Screen.Record.route, Screen.Timer.route ->
-                                slideOutHorizontally(
-                                    targetOffsetX = { screenWidth ->
-                                        screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            Screen.About.route ->
-                                slideOutHorizontally(
-                                    targetOffsetX = { screenWidth ->
-                                        -screenWidth
-                                    },
-                                    animationSpec = tween(pageTweenMillis)
-                                )
-                            else -> null
-                        }
-                    },
-                ) {
-                    SettingPage(navController)
-                }
-                composable(
-                    Screen.About.route,
-                    enterTransition = { _, _ ->
+            },
+        ) {
+            TimerPage(timerPageViewModel, navController)
+        }
+        composable(
+            route = Screen.Record.route,
+            enterTransition = { initial, _ ->
+                when (initial.destination.route) {
+                    Screen.Timer.route ->
                         slideInHorizontally(
                             initialOffsetX = { screenWidth ->
                                 screenWidth
                             },
                             animationSpec = tween(pageTweenMillis)
                         )
-                    },
-                    exitTransition = { _, _ ->
+                    Screen.Setting.route ->
+                        slideInHorizontally(
+                            initialOffsetX = { screenWidth ->
+                                -screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    else -> null
+                }
+            },
+            exitTransition = { _, target ->
+                when (target.destination.route) {
+                    Screen.Timer.route ->
                         slideOutHorizontally(
                             targetOffsetX = { screenWidth ->
                                 screenWidth
                             },
                             animationSpec = tween(pageTweenMillis)
                         )
-                    },
-                ) {
-                    About()
+                    Screen.Setting.route ->
+                        slideOutHorizontally(
+                            targetOffsetX = { screenWidth ->
+                                -screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    else -> null
                 }
-            }
+            },
+        ) {
+            RecordPage(recordPageViewModel, navController)
+        }
+        composable(
+            route = "${Screen.Record.route}/{keyId}",
+            arguments = listOf(navArgument("keyId") { type = NavType.IntType } )
+        ) { backStackEntry ->
+            RecordDetails(backStackEntry.arguments!!.getInt("keyId"), navController)
+        }
+        composable(
+            route = Screen.Setting.route,
+            enterTransition = { initial, _ ->
+                when (initial.destination.route) {
+                    Screen.Record.route, Screen.Timer.route ->
+                        slideInHorizontally(
+                            initialOffsetX = { screenWidth ->
+                                screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    Screen.About.route ->
+                        slideInHorizontally(
+                            initialOffsetX = { screenWidth ->
+                                -screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    else -> null
+                }
+            },
+            exitTransition = { _, target ->
+                when (target.destination.route) {
+                    Screen.Record.route, Screen.Timer.route ->
+                        slideOutHorizontally(
+                            targetOffsetX = { screenWidth ->
+                                screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    Screen.About.route ->
+                        slideOutHorizontally(
+                            targetOffsetX = { screenWidth ->
+                                -screenWidth
+                            },
+                            animationSpec = tween(pageTweenMillis)
+                        )
+                    else -> null
+                }
+            },
+        ) {
+            SettingPage(navController)
+        }
+        composable(
+            Screen.About.route,
+            enterTransition = { _, _ ->
+                slideInHorizontally(
+                    initialOffsetX = { screenWidth ->
+                        screenWidth
+                    },
+                    animationSpec = tween(pageTweenMillis)
+                )
+            },
+            exitTransition = { _, _ ->
+                slideOutHorizontally(
+                    targetOffsetX = { screenWidth ->
+                        screenWidth
+                    },
+                    animationSpec = tween(pageTweenMillis)
+                )
+            },
+        ) {
+            About()
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.nthily.poptimer.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.PrimaryKey
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +15,6 @@ interface PuzzleDao {
     @Insert
     fun insert(puzzle: Puzzle)
 
+    @Query("SELECT * FROM puzzle WHERE id == :primaryKey")
+    fun searchQuery(primaryKey: Int) : Flow<Puzzle>
 }
